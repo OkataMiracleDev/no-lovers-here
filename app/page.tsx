@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
@@ -10,6 +10,20 @@ export default function Home() {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedTicket, setSelectedTicket] = useState<{ amount: number; type: string } | null>(null);
+  const [menPrice, setMenPrice] = useState(18000);
+  const [womenPrice, setWomenPrice] = useState(8000);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        setMenPrice(data.menTicketPrice);
+        setWomenPrice(data.womenTicketPrice);
+      })
+      .catch(() => {
+        // Use defaults if fetch fails
+      });
+  }, []);
 
   const openEmailModal = (amount: number, ticketType: string) => {
     setSelectedTicket({ amount, type: ticketType });
@@ -270,7 +284,7 @@ export default function Home() {
                 <span className="inline-block px-3 py-1 bg-red-50 text-red-600 text-xs font-bold uppercase rounded-full">Men</span>
               </div>
               <div className="mb-6">
-                <div className="text-5xl font-black mb-2">₦18,000</div>
+                <div className="text-5xl font-black mb-2">₦{menPrice.toLocaleString()}</div>
                 <p className="text-gray-500">Per ticket</p>
               </div>
               <ul className="space-y-3 mb-8 text-sm">
@@ -300,7 +314,7 @@ export default function Home() {
                 </li>
               </ul>
               <button
-                onClick={() => openEmailModal(18000, 'Men')}
+                onClick={() => openEmailModal(menPrice, 'Men')}
                 disabled={isPaymentLoading}
                 className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
               >
@@ -314,7 +328,7 @@ export default function Home() {
                 <span className="inline-block px-3 py-1 bg-red-50 text-red-600 text-xs font-bold uppercase rounded-full">Women</span>
               </div>
               <div className="mb-6">
-                <div className="text-5xl font-black mb-2">₦8,000</div>
+                <div className="text-5xl font-black mb-2">₦{womenPrice.toLocaleString()}</div>
                 <p className="text-gray-500">Per ticket</p>
               </div>
               <ul className="space-y-3 mb-8 text-sm">
@@ -344,7 +358,7 @@ export default function Home() {
                 </li>
               </ul>
               <button
-                onClick={() => openEmailModal(8000, 'Women')}
+                onClick={() => openEmailModal(womenPrice, 'Women')}
                 disabled={isPaymentLoading}
                 className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
               >

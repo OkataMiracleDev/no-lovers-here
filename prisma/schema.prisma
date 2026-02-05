@@ -31,6 +31,8 @@ model Settings {
   maxTickets      Int      @default(500)
   menTicketsSold  Int      @default(0)
   womenTicketsSold Int     @default(0)
+  menTicketPrice  Int      @default(18000)
+  womenTicketPrice Int     @default(8000)
   updatedAt       DateTime @updatedAt
 }
 

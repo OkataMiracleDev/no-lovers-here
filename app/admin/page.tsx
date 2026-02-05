@@ -20,6 +20,8 @@ interface Settings {
   maxTickets: number;
   menTicketsSold: number;
   womenTicketsSold: number;
+  menTicketPrice: number;
+  womenTicketPrice: number;
 }
 
 export default function AdminDashboard() {
@@ -43,6 +45,8 @@ export default function AdminDashboard() {
   const [createName, setCreateName] = useState('');
   const [createType, setCreateType] = useState<'Men' | 'Women'>('Men');
   const [maxTickets, setMaxTickets] = useState(500);
+  const [menPrice, setMenPrice] = useState(18000);
+  const [womenPrice, setWomenPrice] = useState(8000);
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
@@ -53,7 +57,11 @@ export default function AdminDashboard() {
       const data = await res.json();
       setTickets(data.tickets);
       setSettings(data.settings);
-      if (data.settings) setMaxTickets(data.settings.maxTickets);
+      if (data.settings) {
+        setMaxTickets(data.settings.maxTickets);
+        setMenPrice(data.settings.menTicketPrice);
+        setWomenPrice(data.settings.womenTicketPrice);
+      }
     } catch {
       console.error('Error fetching tickets');
     }
@@ -169,7 +177,11 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${password}`
         },
-        body: JSON.stringify({ maxTickets })
+        body: JSON.stringify({ 
+          maxTickets,
+          menTicketPrice: menPrice,
+          womenTicketPrice: womenPrice
+        })
       });
       alert('Settings updated!');
       fetchTickets();
@@ -249,7 +261,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <p className="text-gray-500 text-sm mb-2">Revenue</p>
               <p className="text-4xl font-black">
-                ₦{((settings.menTicketsSold * 18000 + settings.womenTicketsSold * 8000) / 1000).toFixed(0)}K
+                ₦{((settings.menTicketsSold * settings.menTicketPrice + settings.womenTicketsSold * settings.womenTicketPrice) / 1000).toFixed(0)}K
               </p>
             </div>
           </div>
@@ -470,6 +482,24 @@ export default function AdminDashboard() {
                     type="number"
                     value={maxTickets}
                     onChange={(e) => setMaxTickets(parseInt(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Men Ticket Price (₦)</label>
+                  <input
+                    type="number"
+                    value={menPrice}
+                    onChange={(e) => setMenPrice(parseInt(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Women Ticket Price (₦)</label>
+                  <input
+                    type="number"
+                    value={womenPrice}
+                    onChange={(e) => setWomenPrice(parseInt(e.target.value))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                   />
                 </div>
