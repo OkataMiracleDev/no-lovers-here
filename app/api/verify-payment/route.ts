@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     );
 
     const paystackData = await paystackResponse.json();
-    console.log('Paystack response:', paystackData);
+    console.log('Paystack response:', JSON.stringify(paystackData, null, 2));
 
     if (!paystackData.status || paystackData.data.status !== 'success') {
       console.error('Payment not successful:', paystackData);
@@ -36,13 +36,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, amount, metadata } = paystackData.data;
+    // Extract data from Paystack response
+    const paymentData = paystackData.data;
+    const email = paymentData.customer?.email || paymentData.email;
+    const amount = paymentData.amount;
+    const metadata = paymentData.metadata || {};
+    
+    console.log('Extracted payment data:', {
+      email,
+      amount,
+      metadata,
+      customer: paymentData.customer,
+    });
+
+    if (!email) {
+      console.error('Email not found in Paystack response');
+      return NextResponse.json(
+        { error: 'Email not found in payment data', details: paymentData },
+        { status: 400 }
+      );
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ticketType = metadata.custom_fields.find((f: any) => f.variable_name === 'ticket')?.value || 'Unknown';
+    const ticketType = metadata.custom_fields?.find((f: any) => f.variable_name === 'ticket')?.value || metadata.ticket_type || 'Unknown';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const customerName = metadata.custom_fields.find((f: any) => f.variable_name === 'name')?.value || email.split('@')[0];
+    const customerName = metadata.custom_fields?.find((f: any) => f.variable_name === 'name')?.value || metadata.customer_name || paymentData.customer?.first_name || email.split('@')[0];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const quantity = parseInt(metadata.custom_fields.find((f: any) => f.variable_name === 'quantity')?.value || '1');
+    const quantity = parseInt(metadata.custom_fields?.find((f: any) => f.variable_name === 'quantity')?.value || metadata.quantity || '1');
 
     console.log('Ticket details:', { email, ticketType, customerName, quantity });
 
