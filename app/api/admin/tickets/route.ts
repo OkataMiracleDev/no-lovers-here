@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     });
 
     const settings = await prisma.settings.findUnique({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
     });
 
     return NextResponse.json({ tickets, settings });

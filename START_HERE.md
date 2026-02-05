@@ -78,9 +78,11 @@ All your questions have been answered and your app is ready to deploy!
 ### Step 2: Prepare
 
 #### Get Your Services Ready:
-1. **Database:** Create PostgreSQL at https://neon.tech (free)
+1. **Database:** Create MongoDB Atlas cluster at https://www.mongodb.com/cloud/atlas (free)
 2. **Paystack:** Get test keys from https://dashboard.paystack.com
 3. **Brevo:** Get API key from https://app.brevo.com
+
+**Database guide:** `MONGODB_ATLAS_SETUP.md`
 
 #### Prepare Environment Variables:
 Copy from `.env.example` and fill in your values

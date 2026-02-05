@@ -3,9 +3,13 @@
 ## 🚀 Deploy in 15 Minutes
 
 ### Step 1: Database (2 minutes)
-1. Go to https://neon.tech (free PostgreSQL)
-2. Create new project
-3. Copy connection string
+1. Go to https://www.mongodb.com/cloud/atlas (free MongoDB)
+2. Create free M0 cluster
+3. Create database user
+4. Allow network access (0.0.0.0/0)
+5. Copy connection string
+
+**Detailed guide:** `MONGODB_ATLAS_SETUP.md`
 
 ### Step 2: Push Schema (1 minute)
 ```bash
@@ -39,7 +43,7 @@ Copy these to Vercel/Render:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+DATABASE_URL=mongodb+srv://user:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
 
 # Paystack (get from dashboard.paystack.com)
 NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxx

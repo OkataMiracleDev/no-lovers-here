@@ -101,7 +101,7 @@ All your questions have been answered and comprehensive guides created:
 
 ```bash
 # 1. Setup database
-Go to https://neon.tech → Create project → Copy connection string
+Go to https://www.mongodb.com/cloud/atlas → Create free cluster → Get connection string
 
 # 2. Push schema
 $env:DATABASE_URL="your-connection-string"

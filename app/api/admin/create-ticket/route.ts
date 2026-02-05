@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
 
     // Check ticket limits
     const settings = await prisma.settings.upsert({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
       update: {},
-      create: { id: 'settings' },
+      create: { settingsId: 'settings' },
     });
 
     const totalSold = settings.menTicketsSold + settings.womenTicketsSold;
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Update ticket count
     await prisma.settings.update({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
       data: {
         menTicketsSold: ticketType === 'Men' ? { increment: 1 } : undefined,
         womenTicketsSold: ticketType === 'Women' ? { increment: 1 } : undefined,

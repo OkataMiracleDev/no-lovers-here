@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
     }
 
     const settings = await prisma.settings.upsert({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
       update: {},
-      create: { id: 'settings' },
+      create: { settingsId: 'settings' },
     });
 
     return NextResponse.json({ settings });
@@ -34,14 +34,14 @@ export async function PUT(request: NextRequest) {
     const { maxTickets, menTicketPrice, womenTicketPrice } = await request.json();
 
     const settings = await prisma.settings.upsert({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
       update: { 
         maxTickets,
         menTicketPrice,
         womenTicketPrice
       },
       create: { 
-        id: 'settings', 
+        settingsId: 'settings', 
         maxTickets,
         menTicketPrice,
         womenTicketPrice

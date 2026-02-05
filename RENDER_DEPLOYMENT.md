@@ -10,22 +10,15 @@ This guide will help you deploy your Next.js application to Render.
 
 ## Step 1: Prepare Your Database
 
-### Option A: Neon (Recommended - Free)
-1. Go to https://neon.tech
-2. Create a new project
-3. Copy the connection string (looks like: `postgresql://user:pass@host/dbname`)
+### MongoDB Atlas (Free)
+1. Go to https://www.mongodb.com/cloud/atlas
+2. Create a free M0 cluster
+3. Create database user
+4. Allow network access (0.0.0.0/0)
+5. Get connection string
+6. Format: `mongodb+srv://user:pass@cluster.mongodb.net/dbname?retryWrites=true&w=majority`
 
-### Option B: Supabase (Free)
-1. Go to https://supabase.com
-2. Create a new project
-3. Go to Settings > Database
-4. Copy the connection string
-
-### Option C: Render PostgreSQL
-1. In Render dashboard, click "New +"
-2. Select "PostgreSQL"
-3. Choose free tier
-4. Copy the "Internal Database URL"
+**Detailed guide:** See `MONGODB_ATLAS_SETUP.md`
 
 ## Step 2: Push Database Schema
 
@@ -65,7 +58,7 @@ Click "Advanced" and add these environment variables:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+DATABASE_URL=mongodb+srv://user:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
 
 # Paystack
 NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxx
@@ -135,9 +128,10 @@ If you want real-time payment notifications:
 - Check build logs for specific errors
 
 ### Database Connection Issues
-- Ensure DATABASE_URL format is correct: `postgresql://user:pass@host:5432/dbname`
-- Check if database allows external connections
-- Verify database is running
+- Ensure DATABASE_URL format is correct: `mongodb+srv://user:pass@cluster.mongodb.net/dbname?retryWrites=true&w=majority`
+- Check if MongoDB Atlas allows connections from anywhere (0.0.0.0/0)
+- Verify database user credentials are correct
+- Check for special characters in password (URL encode them)
 
 ### Email Not Sending
 - Verify `BREVO_API_KEY` is correct

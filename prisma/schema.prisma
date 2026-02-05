@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Ticket {
-  id            String   @id @default(cuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   email         String
   name          String?
   ticketType    String   // "Men" or "Women"
@@ -27,7 +27,8 @@ model Ticket {
 }
 
 model Settings {
-  id              String   @id @default("settings")
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  settingsId      String   @unique @default("settings")
   maxTickets      Int      @default(500)
   menTicketsSold  Int      @default(0)
   womenTicketsSold Int     @default(0)
@@ -37,7 +38,7 @@ model Settings {
 }
 
 model Admin {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
   name      String

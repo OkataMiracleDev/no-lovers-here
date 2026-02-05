@@ -4,9 +4,9 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const settings = await prisma.settings.upsert({
-      where: { id: 'settings' },
+      where: { settingsId: 'settings' },
       update: {},
-      create: { id: 'settings' },
+      create: { settingsId: 'settings' },
     });
 
     return NextResponse.json({ 

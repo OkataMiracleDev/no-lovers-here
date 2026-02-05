@@ -6,7 +6,7 @@ Deploy your Next.js frontend to Vercel (recommended for Next.js apps).
 ## Prerequisites
 - GitHub account with your code pushed
 - Vercel account (free tier at https://vercel.com)
-- PostgreSQL database already set up
+- MongoDB Atlas database (free tier at https://www.mongodb.com/cloud/atlas)
 
 ## Step 1: Prepare for Deployment
 
@@ -44,8 +44,8 @@ Vercel will auto-detect Next.js settings:
 Click "Environment Variables" and add ALL of these:
 
 ```bash
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+# Database (MongoDB Atlas)
+DATABASE_URL=mongodb+srv://user:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
 
 # Paystack Payment Gateway
 NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxx
@@ -189,9 +189,10 @@ API routes are automatically cached. No additional config needed.
 
 ### Runtime Errors
 **Error: "PrismaClient is unable to connect"**
-- Check DATABASE_URL format
-- Ensure database allows connections from Vercel IPs
-- Verify database is running
+- Check DATABASE_URL format (MongoDB connection string)
+- Ensure MongoDB Atlas allows connections from anywhere (0.0.0.0/0)
+- Verify database user credentials
+- Check for special characters in password (URL encode them)
 
 **Error: "Paystack is not defined"**
 - Ensure Paystack script is in `app/layout.tsx`
@@ -214,7 +215,7 @@ API routes are automatically cached. No additional config needed.
 ### Required Variables
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host/db` |
+| `DATABASE_URL` | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/db?retryWrites=true&w=majority` |
 | `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key | `pk_test_xxx` |
 | `PAYSTACK_SECRET_KEY` | Paystack secret key | `sk_test_xxx` |
 | `BREVO_API_KEY` | Brevo API key | `xkeysib-xxx` |
