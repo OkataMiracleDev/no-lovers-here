@@ -196,7 +196,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Image src="/logo.png" alt="NLH" width={140} height={45} className="mx-auto mb-6" unoptimized />
+            <Image src="/logo.png" alt="NLH" width={60} height={20} className="mx-auto mb-6" unoptimized />
             <h1 className="text-3xl font-black mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">Enter password to continue</p>
           </div>

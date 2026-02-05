@@ -37,10 +37,22 @@ export default function Home() {
       return;
     }
     
+    // Check if Paystack is loaded
+    if (typeof window === 'undefined' || !(window as any).PaystackPop) {
+      alert('Payment system is loading. Please try again in a moment.');
+      return;
+    }
+    
     setIsPaymentLoading(true);
     setShowEmailModal(false);
     
-    const paystackKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxxxxxx';
+    const paystackKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+    
+    if (!paystackKey) {
+      alert('Payment configuration error. Please contact support.');
+      setIsPaymentLoading(false);
+      return;
+    }
     
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
