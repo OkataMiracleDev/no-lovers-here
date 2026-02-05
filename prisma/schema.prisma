@@ -22,8 +22,6 @@ model Ticket {
   scannedBy     String?
 
   @@index([email])
-  @@index([qrCode])
-  @@index([paymentRef])
 }
 
 model Settings {
