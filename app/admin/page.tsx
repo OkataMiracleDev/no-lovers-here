@@ -250,7 +250,7 @@ export default function AdminDashboard() {
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/logo.png" alt="NLH" width={100} height={35} unoptimized />
+            <Image src="/logo.png" alt="NLH" width={40} height={20} unoptimized />
             <span className="text-gray-300">|</span>
             <h1 className="text-lg font-bold">Admin</h1>
           </div>
