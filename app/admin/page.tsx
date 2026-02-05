@@ -556,20 +556,15 @@ export default function AdminDashboard() {
                   <h3 className="font-bold mb-4">Ticket Capacity</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-semibold mb-2">Total Maximum Tickets</label>
-                      <input
-                        type="number"
-                        value={maxTickets}
-                        onChange={(e) => setMaxTickets(parseInt(e.target.value))}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                      />
-                    </div>
-                    <div>
                       <label className="block text-sm font-semibold mb-2">Maximum Men Tickets</label>
                       <input
                         type="number"
                         value={maxMenTickets}
-                        onChange={(e) => setMaxMenTickets(parseInt(e.target.value))}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setMaxMenTickets(value);
+                          setMaxTickets(value + maxWomenTickets);
+                        }}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                       />
                     </div>
@@ -578,9 +573,18 @@ export default function AdminDashboard() {
                       <input
                         type="number"
                         value={maxWomenTickets}
-                        onChange={(e) => setMaxWomenTickets(parseInt(e.target.value))}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setMaxWomenTickets(value);
+                          setMaxTickets(maxMenTickets + value);
+                        }}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
                       />
+                    </div>
+                    <div className="bg-white p-3 rounded border border-gray-200">
+                      <label className="block text-sm font-semibold mb-1">Total Maximum Tickets (Auto-calculated)</label>
+                      <p className="text-2xl font-black text-red-600">{maxTickets}</p>
+                      <p className="text-xs text-gray-500 mt-1">Men ({maxMenTickets}) + Women ({maxWomenTickets})</p>
                     </div>
                   </div>
                 </div>
