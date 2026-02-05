@@ -105,18 +105,6 @@ export default function Home() {
       setIsPaymentLoading(false);
     }
   };
-        },
-        onClose: function() {
-          setIsPaymentLoading(false);
-        }
-      });
-      handler.openIframe();
-    } catch (error) {
-      console.error('Paystack error:', error);
-      alert('Error initializing payment. Please refresh and try again.');
-      setIsPaymentLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
