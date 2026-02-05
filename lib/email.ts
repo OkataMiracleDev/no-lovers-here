@@ -167,3 +167,37 @@ export async function sendTicketEmail(
 
   return response.json();
 }
+
+
+export async function sendBulkEmail(
+  recipients: { email: string; name: string }[],
+  subject: string,
+  htmlContent: string
+) {
+  // Use Brevo REST API to send bulk emails
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': process.env.BREVO_API_KEY || '',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: {
+        name: process.env.BREVO_SENDER_NAME || 'NO LOVERS HERE',
+        email: process.env.BREVO_SENDER_EMAIL || 'noreply@example.com',
+      },
+      to: recipients,
+      subject: subject,
+      htmlContent: htmlContent,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to send bulk email: ${error}`);
+  }
+
+  const result = await response.json();
+  return { success: true, result };
+}
