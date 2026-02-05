@@ -1,297 +1,355 @@
-# Vercel Deployment Guide
+# Vercel Deployment Guide - UPDATED
+
+## ✅ LATEST FIX APPLIED
+**Build Error Fixed:** Removed `--webpack` flag from build script in `package.json`. Vercel now builds successfully!
 
 ## Overview
-Deploy your Next.js frontend to Vercel (recommended for Next.js apps).
+Deploy your Next.js app (frontend + backend API routes) to Vercel.
 
 ## Prerequisites
-- GitHub account with your code pushed
-- Vercel account (free tier at https://vercel.com)
-- MongoDB Atlas database (free tier at https://www.mongodb.com/cloud/atlas)
+- GitHub account with code pushed
+- Vercel account (free at https://vercel.com)
+- MongoDB Atlas database (free at https://www.mongodb.com/cloud/atlas)
+- Paystack account with API keys
+- Brevo account with API key
 
-## Step 1: Prepare for Deployment
+## Quick Start
 
-### 1.1 Verify Your Code
-Ensure these files are in your repository:
-- `package.json`
-- `next.config.ts`
-- `tsconfig.json`
-- `.env.example` (for reference, NOT `.env`)
-
-### 1.2 Add `.env` to `.gitignore`
-Make sure `.env` is in your `.gitignore`:
-```
-.env
-.env.local
-```
-
-## Step 2: Deploy to Vercel
-
-### 2.1 Import Project
+### 1. Import to Vercel
 1. Go to https://vercel.com/new
-2. Click "Import Git Repository"
-3. Select your GitHub repository
-4. Click "Import"
+2. Import GitHub repository: `OkataMiracleDev/no-lovers-here`
+3. Vercel auto-detects Next.js settings
 
-### 2.2 Configure Project
-Vercel will auto-detect Next.js settings:
-- Framework Preset: `Next.js`
-- Root Directory: `./` (leave as is)
-- Build Command: `npm run build` (auto-detected)
-- Output Directory: `.next` (auto-detected)
+### 2. Add Environment Variables
 
-### 2.3 Environment Variables
+**CRITICAL:** Add ALL these variables BEFORE deploying!
 
-Click "Environment Variables" and add ALL of these:
+Go to Project Settings → Environment Variables and add:
 
 ```bash
 # Database (MongoDB Atlas)
-DATABASE_URL=mongodb+srv://user:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/nolovershere?retryWrites=true&w=majority&appName=no-lovers-here
 
-# Paystack Payment Gateway
-NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxx
-PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxxxxxx
+# Paystack Payment (Use your actual keys from Paystack dashboard)
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_xxxxxxxxxxxxx
+PAYSTACK_SECRET_KEY=sk_live_xxxxxxxxxxxxx
 
-# Brevo Email Service
+# Brevo Email Service (Use your actual API key from Brevo)
 BREVO_API_KEY=xkeysib-xxxxxxxxxxxxx
-BREVO_SENDER_EMAIL=noreply@yourdomain.com
-BREVO_SENDER_NAME=NO LOVERS HERE
+BREVO_SENDER_EMAIL=noreply.nolovershere@gmail.com
+BREVO_SENDER_NAME=NO-LOVERS
 
-# Admin Authentication
-ADMIN_SECRET=your-secure-random-string-here
-NEXT_PUBLIC_ADMIN_SECRET=your-secure-random-string-here
+# Admin Authentication (Change to secure password)
+ADMIN_SECRET=your-secure-password
+NEXT_PUBLIC_ADMIN_SECRET=your-secure-password
 
-# Application URL (will update after deployment)
+# Application URL (update after first deploy)
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ```
 
+**IMPORTANT:** Replace the placeholder values above with your actual credentials from:
+- MongoDB Atlas connection string (from your .env file)
+- Paystack keys (from https://dashboard.paystack.com/#/settings/developers)
+- Brevo API key (from https://app.brevo.com/settings/keys/api)
+- Your chosen admin password
+
 **Important:**
-- Add variables for ALL environments (Production, Preview, Development)
-- Use SAME value for `ADMIN_SECRET` and `NEXT_PUBLIC_ADMIN_SECRET`
-- You'll update `NEXT_PUBLIC_APP_URL` after first deployment
+- Add to ALL environments (Production, Preview, Development)
+- You're using LIVE Paystack keys (not test)
+- Update `NEXT_PUBLIC_APP_URL` after first deployment
 
-### 2.4 Deploy
+### 3. Deploy
 1. Click "Deploy"
-2. Wait 2-3 minutes for build
-3. Once deployed, copy your Vercel URL
+2. Wait 2-3 minutes
+3. Copy your Vercel URL
 
-### 2.5 Update App URL
-1. Go to Project Settings → Environment Variables
-2. Find `NEXT_PUBLIC_APP_URL`
-3. Update to your actual Vercel URL (e.g., `https://your-app.vercel.app`)
-4. Redeploy: Deployments → Latest → "Redeploy"
+### 4. Update App URL
+1. Go to Settings → Environment Variables
+2. Update `NEXT_PUBLIC_APP_URL` with your actual Vercel URL
+3. Redeploy (Deployments → Latest → "Redeploy")
 
-## Step 3: Database Setup
+## Database Setup
 
-### 3.1 Push Prisma Schema
-From your local machine:
+Your MongoDB schema should already be pushed. If not:
 
 ```bash
-# Set DATABASE_URL
-$env:DATABASE_URL="your-postgresql-connection-string"
-
-# Push schema
+# Local terminal
 npm run db:push
-
-# Verify
-npm run db:studio
 ```
 
-### 3.2 Verify Database Connection
-Check Vercel deployment logs:
-1. Go to your project → Deployments
-2. Click latest deployment
-3. Check "Functions" logs for database errors
+This creates these collections:
+- `Ticket` - Stores all tickets
+- `Settings` - Stores event settings (prices, limits)
+- `Admin` - Admin users
 
-## Step 4: Verify Deployment
+## Testing Your Deployment
 
-### 4.1 Test Frontend
+### Test Frontend
 1. Visit your Vercel URL
-2. Check that prices load correctly
-3. Verify images display
-4. Test responsive design
+2. Verify prices display correctly
+3. Check responsive design
 
-### 4.2 Test Payment Flow
+### Test Payment Flow
 1. Click "Buy Now" on a ticket
-2. Fill in email and name
-3. Use Paystack test card:
-   - Card: `4084084084084081`
-   - CVV: `408`
-   - Expiry: Any future date
-   - PIN: `0000`
-   - OTP: `123456`
-4. Verify email is received
+2. Enter email and name
+3. Complete Paystack payment (LIVE payment - real money!)
+4. Check email for ticket with QR code
 
-### 4.3 Test Admin Panel
+### Test Admin Panel
 1. Go to `/admin`
-2. Login with your `ADMIN_SECRET`
-3. Verify all tabs work:
-   - Tickets list
-   - Email sending
-   - Ticket scanning
-   - Create ticket
-   - Settings (including price changes)
+2. Password: `2006`
+3. Test all tabs:
+   - **Tickets:** View all tickets, delete tickets
+   - **Email:** Send tickets to specific email
+   - **Scan:** Scan QR codes (manual entry or camera)
+   - **Create:** Create tickets manually
+   - **Settings:** Adjust prices and ticket limits
 
-## Step 5: Custom Domain (Optional)
+## What Gets Deployed
 
-### 5.1 Add Domain
+✅ **Frontend:** Next.js app with React  
+✅ **Backend:** API routes as serverless functions  
+✅ **Database:** MongoDB Atlas (external)  
+✅ **Email:** Brevo API (external)  
+✅ **Payment:** Paystack (external)  
+✅ **HTTPS:** Automatic SSL  
+✅ **CDN:** Global edge network  
+
+## Automatic Deployments
+
+Every push to `main` triggers a new deployment:
+
+```bash
+git add .
+git commit -m "Your changes"
+git push origin main
+```
+
+Vercel builds and deploys automatically in 2-3 minutes.
+
+## Monitoring & Debugging
+
+### View Function Logs
+1. Vercel Dashboard → Your Project
+2. Deployments → Latest
+3. Functions tab
+4. Click any function to see logs
+
+### Key API Routes
+- `/api/verify-payment` - Payment verification (has extensive logging)
+- `/api/admin/create-ticket` - Manual ticket creation
+- `/api/admin/send-email` - Email sending
+- `/api/admin/settings` - Settings updates
+- `/api/admin/tickets` - Ticket listing
+- `/api/admin/tickets/[id]` - Delete ticket
+- `/api/admin/scan` - QR code scanning
+
+### Common Log Messages
+The verify-payment route has detailed logging:
+- "Verifying payment: [reference]"
+- "Paystack response: [data]"
+- "Ticket details: [info]"
+- "Settings: [current settings]"
+- "Payment verification complete"
+
+## Troubleshooting
+
+### Build Errors
+
+**❌ Error: "unknown option --no-turbopack"**  
+✅ **FIXED:** Removed flag from build script
+
+**❌ Error: "Cannot find module @prisma/client"**  
+✅ Solution: Run `npm run postinstall` locally, commit, push
+
+**❌ TypeScript errors about maxMenTickets/maxWomenTickets**  
+✅ Solution: Run `npm run postinstall` to regenerate Prisma client
+
+### Runtime Errors
+
+**❌ "Payment verification failed" (500 error)**  
+Check these in order:
+1. Verify `PAYSTACK_SECRET_KEY` is set in Vercel
+2. Check function logs for specific error
+3. Ensure MongoDB has all schema fields
+4. Verify Paystack keys are correct
+
+**❌ "PrismaClient unable to connect"**  
+Solutions:
+- Check `DATABASE_URL` format
+- Ensure MongoDB Atlas allows connections from `0.0.0.0/0`
+- Verify database name `nolovershere` is in connection string
+- Check MongoDB user has read/write permissions
+
+**❌ Emails not sending**  
+Solutions:
+- Verify `BREVO_API_KEY` is correct
+- Check `BREVO_SENDER_EMAIL` is verified in Brevo dashboard
+- Look at function logs for email errors
+- Test API key in Brevo dashboard
+
+**❌ Admin panel not loading**  
+Solutions:
+- Verify both `ADMIN_SECRET` and `NEXT_PUBLIC_ADMIN_SECRET` are set
+- Clear browser cache
+- Check browser console for errors
+- Try incognito mode
+
+### Database Issues
+
+**❌ "Settings not found" errors**  
+The app auto-creates settings with defaults:
+- `maxTickets`: 500
+- `maxMenTickets`: 250
+- `maxWomenTickets`: 250
+- `menTicketPrice`: 18000 (₦180)
+- `womenTicketPrice`: 8000 (₦80)
+
+**❌ Ticket counts not updating**  
+Check:
+- Settings exist in database
+- `menTicketsSold` and `womenTicketsSold` fields exist
+- Run `npm run db:push` if schema is outdated
+
+## Environment Variables Checklist
+
+Before deploying, ensure ALL are set:
+
+- [ ] `DATABASE_URL`
+- [ ] `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`
+- [ ] `PAYSTACK_SECRET_KEY`
+- [ ] `BREVO_API_KEY`
+- [ ] `BREVO_SENDER_EMAIL`
+- [ ] `BREVO_SENDER_NAME`
+- [ ] `ADMIN_SECRET`
+- [ ] `NEXT_PUBLIC_ADMIN_SECRET`
+- [ ] `NEXT_PUBLIC_APP_URL`
+
+## Custom Domain (Optional)
+
+### Add Domain
 1. Project Settings → Domains
-2. Add your domain (e.g., `nolovershere.com`)
-3. Follow DNS configuration instructions
+2. Add domain (e.g., `nolovershere.com`)
+3. Configure DNS as instructed
 
-### 5.2 Update Environment Variables
-1. Update `NEXT_PUBLIC_APP_URL` to your custom domain
-2. Update `BREVO_SENDER_EMAIL` to use your domain
-3. Redeploy
-
-### 5.3 Configure DNS
-Add these records to your domain provider:
-
-**For root domain (nolovershere.com):**
+### DNS Records
+**Root domain:**
 ```
 Type: A
 Name: @
 Value: 76.76.21.21
 ```
 
-**For www subdomain:**
+**WWW subdomain:**
 ```
 Type: CNAME
 Name: www
 Value: cname.vercel-dns.com
 ```
 
-## Step 6: Performance Optimization
+### Update Environment
+1. Update `NEXT_PUBLIC_APP_URL` to custom domain
+2. Redeploy
 
-### 6.1 Enable Analytics (Optional)
-1. Project Settings → Analytics
-2. Enable Vercel Analytics
-3. Monitor page views and performance
+## Performance
 
-### 6.2 Image Optimization
-Vercel automatically optimizes images. Ensure you're using Next.js `<Image>` component (already done).
+Vercel automatically provides:
+- Image optimization
+- Code splitting
+- Edge caching
+- Gzip compression
+- HTTP/2
+- Global CDN
 
-### 6.3 Caching
-API routes are automatically cached. No additional config needed.
+No additional configuration needed!
 
-## Troubleshooting
+## Vercel Free Tier
 
-### Build Fails
-**Error: "Cannot find module '@prisma/client'"**
-- Solution: Ensure `prisma generate` runs during build
-- Add to `package.json` scripts:
-  ```json
-  "postinstall": "prisma generate"
-  ```
-
-**Error: "DATABASE_URL is not defined"**
-- Solution: Add `DATABASE_URL` to environment variables
-- Redeploy after adding
-
-### Runtime Errors
-**Error: "PrismaClient is unable to connect"**
-- Check DATABASE_URL format (MongoDB connection string)
-- Ensure MongoDB Atlas allows connections from anywhere (0.0.0.0/0)
-- Verify database user credentials
-- Check for special characters in password (URL encode them)
-
-**Error: "Paystack is not defined"**
-- Ensure Paystack script is in `app/layout.tsx`
-- Check browser console for script loading errors
-
-### Email Issues
-**Emails not sending:**
-- Verify `BREVO_API_KEY` is correct
-- Check sender email is verified in Brevo
-- Look at Function logs in Vercel
-
-### Admin Login Issues
-**Can't login:**
-- Verify `ADMIN_SECRET` matches `NEXT_PUBLIC_ADMIN_SECRET`
-- Clear browser cache
-- Check browser console for errors
-
-## Environment Variables Reference
-
-### Required Variables
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/db?retryWrites=true&w=majority` |
-| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key | `pk_test_xxx` |
-| `PAYSTACK_SECRET_KEY` | Paystack secret key | `sk_test_xxx` |
-| `BREVO_API_KEY` | Brevo API key | `xkeysib-xxx` |
-| `BREVO_SENDER_EMAIL` | Verified sender email | `noreply@domain.com` |
-| `BREVO_SENDER_NAME` | Sender name | `NO LOVERS HERE` |
-| `ADMIN_SECRET` | Admin password | `secure-random-string` |
-| `NEXT_PUBLIC_ADMIN_SECRET` | Admin password (public) | Same as above |
-| `NEXT_PUBLIC_APP_URL` | Your app URL | `https://app.vercel.app` |
-
-### Security Notes
-- Never commit `.env` to Git
-- Use different secrets for production vs development
-- Rotate secrets regularly
-- Use strong random strings for `ADMIN_SECRET`
-
-## Vercel Free Tier Limits
-
-Free tier includes:
+Includes:
 - 100 GB bandwidth/month
 - Unlimited deployments
+- Unlimited API requests
 - Automatic HTTPS
-- Global CDN
-- Serverless functions
+- Preview deployments
+- Analytics (basic)
 
-**Upgrade to Pro ($20/month) for:**
-- More bandwidth
-- Team collaboration
-- Advanced analytics
-- Priority support
+Perfect for this event ticketing app!
 
 ## Going Live Checklist
 
-- [ ] All environment variables set
-- [ ] Database schema pushed
-- [ ] Test payment completed successfully
-- [ ] Test email received
-- [ ] Admin panel tested
+- [ ] All environment variables set in Vercel
+- [ ] Database schema pushed to MongoDB
+- [ ] Test payment completed (LIVE payment!)
+- [ ] Test email received with QR code
+- [ ] Admin panel tested (all tabs)
+- [ ] Prices display correctly
+- [ ] Ticket limits work
+- [ ] Delete tickets works
+- [ ] QR scanning works
+- [ ] Mobile responsive
 - [ ] Custom domain configured (if applicable)
-- [ ] Paystack live keys added (when ready)
-- [ ] Sender email verified in Brevo
-- [ ] Analytics enabled
-- [ ] Error monitoring set up
 
-## Production Deployment
+## Production Tips
 
-When ready for production:
+### Security
+- Admin password is `2006` - consider changing for production
+- Never commit `.env` to Git
+- Rotate API keys periodically
+- Monitor function logs for suspicious activity
 
-1. **Update Paystack Keys:**
-   - Change to live keys: `pk_live_...` and `sk_live_...`
-   - Test with small real payment first
+### Monitoring
+- Enable Vercel Analytics
+- Check function logs regularly
+- Monitor Paystack dashboard for payments
+- Watch MongoDB Atlas metrics
 
-2. **Update Environment Variables:**
-   - Set `NEXT_PUBLIC_APP_URL` to production domain
-   - Verify all other variables
-
-3. **Test Everything:**
-   - Complete payment flow
-   - Email delivery
-   - Admin functions
-   - Mobile responsiveness
-
-4. **Monitor:**
-   - Check Vercel Analytics
-   - Monitor Function logs
-   - Watch for errors
-
-## Continuous Deployment
-
-Vercel automatically deploys when you push to GitHub:
-- Push to `main` → Production deployment
-- Push to other branches → Preview deployment
-- Pull requests → Preview deployment with unique URL
+### Backups
+- MongoDB Atlas auto-backs up data
+- Export tickets regularly from admin panel
+- Keep copy of environment variables
 
 ## Support Resources
 
 - Vercel Docs: https://vercel.com/docs
-- Vercel Status: https://vercel-status.com
 - Next.js Docs: https://nextjs.org/docs
-- Vercel Community: https://github.com/vercel/vercel/discussions
+- Prisma Docs: https://www.prisma.io/docs
+- MongoDB Atlas: https://www.mongodb.com/docs/atlas
+- Paystack Docs: https://paystack.com/docs
+- Brevo Docs: https://developers.brevo.com
+
+## Recent Changes
+
+### Latest (Current)
+- ✅ Fixed build error: Removed `--webpack` flag
+- ✅ Added extensive logging to payment verification
+- ✅ Auto-create settings with default values
+- ✅ Regenerated Prisma client with new fields
+
+### Previous
+- Added `maxMenTickets` and `maxWomenTickets` to Settings
+- Added delete ticket functionality
+- Improved email template with QR code
+- Added camera scanning UI
+- Migrated from PostgreSQL to MongoDB Atlas
+
+## Next Steps After Deployment
+
+1. **Test Everything:**
+   - Complete a real payment (LIVE keys!)
+   - Verify email arrives
+   - Test admin functions
+   - Try on mobile device
+
+2. **Monitor:**
+   - Check Vercel function logs
+   - Watch Paystack dashboard
+   - Monitor email delivery in Brevo
+
+3. **Promote:**
+   - Share your Vercel URL
+   - Test with friends first
+   - Go live for event!
+
+## Need Help?
+
+Check function logs in Vercel for detailed error messages. The payment verification route has extensive logging to help debug issues.
