@@ -45,8 +45,11 @@ export default function AdminDashboard() {
   const [createName, setCreateName] = useState('');
   const [createType, setCreateType] = useState<'Men' | 'Women'>('Men');
   const [maxTickets, setMaxTickets] = useState(500);
+  const [maxMenTickets, setMaxMenTickets] = useState(250);
+  const [maxWomenTickets, setMaxWomenTickets] = useState(250);
   const [menPrice, setMenPrice] = useState(18000);
   const [womenPrice, setWomenPrice] = useState(8000);
+  const [useCamera, setUseCamera] = useState(false);
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
@@ -59,6 +62,8 @@ export default function AdminDashboard() {
       setSettings(data.settings);
       if (data.settings) {
         setMaxTickets(data.settings.maxTickets);
+        setMaxMenTickets(data.settings.maxMenTickets || data.settings.maxTickets);
+        setMaxWomenTickets(data.settings.maxWomenTickets || data.settings.maxTickets);
         setMenPrice(data.settings.menTicketPrice);
         setWomenPrice(data.settings.womenTicketPrice);
       }
@@ -179,6 +184,8 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({ 
           maxTickets,
+          maxMenTickets,
+          maxWomenTickets,
           menTicketPrice: menPrice,
           womenTicketPrice: womenPrice
         })
@@ -187,6 +194,23 @@ export default function AdminDashboard() {
       fetchTickets();
     } catch {
       alert('Error updating settings');
+    }
+    setLoading(false);
+  };
+
+  const deleteTicket = async (ticketId: string) => {
+    if (!confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) return;
+    
+    setLoading(true);
+    try {
+      await fetch(`/api/admin/tickets/${ticketId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${password}` }
+      });
+      alert('Ticket deleted successfully');
+      fetchTickets();
+    } catch {
+      alert('Error deleting ticket');
     }
     setLoading(false);
   };
@@ -301,16 +325,19 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Email</th>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Name</th>
                       <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Type</th>
                       <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Amount</th>
                       <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Status</th>
                       <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Date</th>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tickets.map((ticket) => (
                       <tr key={ticket.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 px-4 text-sm">{ticket.email}</td>
+                        <td className="py-3 px-4 text-sm">{ticket.name || '-'}</td>
                         <td className="py-3 px-4">
                           <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
                             ticket.ticketType === 'Men' ? 'bg-red-50 text-red-600' : 'bg-red-50 text-red-600'
@@ -330,6 +357,14 @@ export default function AdminDashboard() {
                         </td>
                         <td className="py-3 px-4 text-gray-500 text-sm">
                           {new Date(ticket.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => deleteTicket(ticket.id)}
+                            className="text-red-600 hover:text-red-800 font-semibold text-sm"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -378,25 +413,65 @@ export default function AdminDashboard() {
             <div className="p-6">
               <h2 className="text-2xl font-black mb-6">Scan Ticket</h2>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">QR Code / Ticket ID</label>
-                  <input
-                    type="text"
-                    value={scanInput}
-                    onChange={(e) => setScanInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && scanTicket()}
-                    placeholder="Scan or enter ticket ID"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                    autoFocus
-                  />
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setUseCamera(false)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+                      !useCamera ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    Manual Entry
+                  </button>
+                  <button
+                    onClick={() => setUseCamera(true)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+                      useCamera ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    📷 Use Camera
+                  </button>
                 </div>
-                <button
-                  onClick={scanTicket}
-                  disabled={loading || !scanInput}
-                  className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50"
-                >
-                  {loading ? 'Scanning...' : 'Scan Ticket'}
-                </button>
+
+                {!useCamera ? (
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">QR Code / Ticket ID</label>
+                    <input
+                      type="text"
+                      value={scanInput}
+                      onChange={(e) => setScanInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && scanTicket()}
+                      placeholder="Scan or enter ticket ID (e.g., NLH-1234567890-abc)"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      autoFocus
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Enter the full ticket ID from the QR code
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 p-6 rounded-lg text-center">
+                    <p className="text-gray-600 mb-4">📷 Camera scanning requires HTTPS</p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Camera scanning works on the deployed site (Vercel). For now, use manual entry or scan with a QR reader app and paste the code.
+                    </p>
+                    <button
+                      onClick={() => setUseCamera(false)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    >
+                      Switch to Manual Entry
+                    </button>
+                  </div>
+                )}
+
+                {!useCamera && (
+                  <button
+                    onClick={scanTicket}
+                    disabled={loading || !scanInput}
+                    className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {loading ? 'Scanning...' : 'Scan Ticket'}
+                  </button>
+                )}
 
                 {scanResult && (
                   <div className={`p-6 rounded-xl border-2 ${
@@ -411,6 +486,7 @@ export default function AdminDashboard() {
                     </h3>
                     {scanResult.ticket && (
                       <div className="space-y-2 text-sm">
+                        <p><strong>Name:</strong> {scanResult.ticket.name || 'N/A'}</p>
                         <p><strong>Email:</strong> {scanResult.ticket.email}</p>
                         <p><strong>Type:</strong> {scanResult.ticket.ticketType}</p>
                         <p><strong>Status:</strong> {scanResult.ticket.status}</p>
@@ -475,40 +551,70 @@ export default function AdminDashboard() {
           {activeTab === 'settings' && (
             <div className="p-6">
               <h2 className="text-2xl font-black mb-6">Settings</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Maximum Tickets</label>
-                  <input
-                    type="number"
-                    value={maxTickets}
-                    onChange={(e) => setMaxTickets(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  />
+              <div className="space-y-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-bold mb-4">Ticket Capacity</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Total Maximum Tickets</label>
+                      <input
+                        type="number"
+                        value={maxTickets}
+                        onChange={(e) => setMaxTickets(parseInt(e.target.value))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Maximum Men Tickets</label>
+                      <input
+                        type="number"
+                        value={maxMenTickets}
+                        onChange={(e) => setMaxMenTickets(parseInt(e.target.value))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Maximum Women Tickets</label>
+                      <input
+                        type="number"
+                        value={maxWomenTickets}
+                        onChange={(e) => setMaxWomenTickets(parseInt(e.target.value))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Men Ticket Price (₦)</label>
-                  <input
-                    type="number"
-                    value={menPrice}
-                    onChange={(e) => setMenPrice(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  />
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-bold mb-4">Ticket Pricing</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Men Ticket Price (₦)</label>
+                      <input
+                        type="number"
+                        value={menPrice}
+                        onChange={(e) => setMenPrice(parseInt(e.target.value))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Women Ticket Price (₦)</label>
+                      <input
+                        type="number"
+                        value={womenPrice}
+                        onChange={(e) => setWomenPrice(parseInt(e.target.value))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Women Ticket Price (₦)</label>
-                  <input
-                    type="number"
-                    value={womenPrice}
-                    onChange={(e) => setWomenPrice(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  />
-                </div>
+
                 <button
                   onClick={updateSettings}
                   disabled={loading}
                   className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50"
                 >
-                  {loading ? 'Saving...' : 'Save Settings'}
+                  {loading ? 'Saving...' : 'Save All Settings'}
                 </button>
               </div>
             </div>

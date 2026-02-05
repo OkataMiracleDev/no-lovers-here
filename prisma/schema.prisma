@@ -28,6 +28,8 @@ model Settings {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   settingsId      String   @unique @default("settings")
   maxTickets      Int      @default(500)
+  maxMenTickets   Int      @default(250)
+  maxWomenTickets Int      @default(250)
   menTicketsSold  Int      @default(0)
   womenTicketsSold Int     @default(0)
   menTicketPrice  Int      @default(18000)

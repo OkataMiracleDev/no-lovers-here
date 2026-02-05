@@ -70,14 +70,15 @@ export default function Home() {
           ]
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callback: async function(response: any) {
-          try {
-            const verifyRes = await fetch('/api/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reference: response.reference })
-            });
-            const data = await verifyRes.json();
+        callback: function(response: any) {
+          // Verify payment
+          fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reference: response.reference })
+          })
+          .then(res => res.json())
+          .then(data => {
             if (data.success) {
               alert('🎉 Payment successful! Check your email for your ticket.');
               setEmail('');
@@ -86,10 +87,24 @@ export default function Home() {
             } else {
               alert('Payment verification failed. Please contact support.');
             }
-          } catch {
+            setIsPaymentLoading(false);
+          })
+          .catch(() => {
             alert('Error verifying payment. Please contact support with reference: ' + response.reference);
-          }
+            setIsPaymentLoading(false);
+          });
+        },
+        onClose: function() {
           setIsPaymentLoading(false);
+        }
+      });
+      handler.openIframe();
+    } catch (error) {
+      console.error('Paystack error:', error);
+      alert('Error initializing payment. Please refresh and try again.');
+      setIsPaymentLoading(false);
+    }
+  };
         },
         onClose: function() {
           setIsPaymentLoading(false);

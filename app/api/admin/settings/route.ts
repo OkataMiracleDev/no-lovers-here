@@ -31,18 +31,22 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { maxTickets, menTicketPrice, womenTicketPrice } = await request.json();
+    const { maxTickets, maxMenTickets, maxWomenTickets, menTicketPrice, womenTicketPrice } = await request.json();
 
     const settings = await prisma.settings.upsert({
       where: { settingsId: 'settings' },
       update: { 
         maxTickets,
+        maxMenTickets: maxMenTickets || maxTickets,
+        maxWomenTickets: maxWomenTickets || maxTickets,
         menTicketPrice,
         womenTicketPrice
       },
       create: { 
         settingsId: 'settings', 
         maxTickets,
+        maxMenTickets: maxMenTickets || maxTickets,
+        maxWomenTickets: maxWomenTickets || maxTickets,
         menTicketPrice,
         womenTicketPrice
       },

@@ -78,7 +78,7 @@ export async function sendTicketEmail(
                           <tr>
                             <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                               <p style="margin: 0; color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">⏰ Time</p>
-                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">9:00 PM - Late</p>
+                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">9:00 PM - 12:00 AM</p>
                             </td>
                           </tr>
                           <tr>
