@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ticket {
+  id            String   @id @default(cuid())
+  email         String
+  name          String?
+  ticketType    String   // "Men" or "Women"
+  amount        Int
+  paymentRef    String   @unique
+  qrCode        String   @unique
+  status        String   @default("active") // active, used, cancelled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  scannedAt     DateTime?
+  scannedBy     String?
+
+  @@index([email])
+  @@index([qrCode])
+  @@index([paymentRef])
+}
+
+model Settings {
+  id              String   @id @default("settings")
+  maxTickets      Int      @default(500)
+  menTicketsSold  Int      @default(0)
+  womenTicketsSold Int     @default(0)
+  updatedAt       DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}
