@@ -1,233 +1,169 @@
-// @ts-ignore - sib-api-v3-sdk has module resolution issues in Next.js
-import * as SibApiV3Sdk from 'sib-api-v3-sdk';
-
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
 export async function sendTicketEmail(
   email: string,
   name: string,
   ticketType: string,
-  qrCode: string,
+  qrCodeData: string,
   ticketId: string
 ) {
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+  const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your NO LOVERS HERE Ticket</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #000000;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table role="presentation" style="width: 600px; max-width: 100%; border-collapse: collapse; background-color: #1a1a1a; border-radius: 10px; overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">
+                NO LOVERS HERE
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">
+                Your Ticket is Ready!
+              </p>
+            </td>
+          </tr>
 
-  sendSmtpEmail.subject = "Your NO LOVERS HERE Ticket 🔥";
-  sendSmtpEmail.to = [{ email, name }];
-  sendSmtpEmail.sender = {
-    name: process.env.BREVO_SENDER_NAME || 'NO LOVERS HERE',
-    email: process.env.BREVO_SENDER_EMAIL || 'noreply@nolovershere.com'
-  };
+          <!-- QR Code Section -->
+          <tr>
+            <td style="padding: 40px 20px; text-align: center; background-color: #ffffff;">
+              <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; display: inline-block;">
+                <img src="${qrCodeData}" alt="QR Code" style="width: 250px; height: 250px; display: block;" />
+              </div>
+              <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                <p style="margin: 5px 0; color: #333333; font-size: 16px;"><strong>Name:</strong> ${name}</p>
+                <p style="margin: 5px 0; color: #333333; font-size: 16px;"><strong>Email:</strong> ${email}</p>
+                <p style="margin: 5px 0; color: #333333; font-size: 16px;"><strong>Ticket Type:</strong> ${ticketType}</p>
+                <p style="margin: 5px 0; color: #666666; font-size: 14px;"><strong>Ticket ID:</strong> ${ticketId}</p>
+              </div>
+            </td>
+          </tr>
 
-  sendSmtpEmail.htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Your NO LOVERS HERE Ticket</title>
-    </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #000000;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background: #000000; padding: 40px 20px;">
-        <tr>
-          <td align="center">
-            <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+          <!-- Event Details -->
+          <tr>
+            <td style="padding: 30px 20px; background-color: #2a2a2a;">
+              <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 24px; text-align: center;">Event Details</h2>
               
-              <!-- Header -->
-              <tr>
-                <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #FF006B 0%, #A855F7 100%);">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: 900; letter-spacing: -1px;">
-                    NO LOVERS HERE
-                  </h1>
-                  <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 600;">
-                    The Anti-Valentine's Experience
-                  </p>
-                </td>
-              </tr>
+              <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 15px; background-color: #333333; border-radius: 8px; margin-bottom: 10px;">
+                    <p style="margin: 0; color: #667eea; font-size: 14px; font-weight: bold;">📅 DATE</p>
+                    <p style="margin: 5px 0 0 0; color: #ffffff; font-size: 16px;">February 14, 2026</p>
+                  </td>
+                </tr>
+                <tr><td style="height: 10px;"></td></tr>
+                <tr>
+                  <td style="padding: 15px; background-color: #333333; border-radius: 8px;">
+                    <p style="margin: 0; color: #667eea; font-size: 14px; font-weight: bold;">⏰ TIME</p>
+                    <p style="margin: 5px 0 0 0; color: #ffffff; font-size: 16px;">9:00 PM - 12:00 AM</p>
+                  </td>
+                </tr>
+                <tr><td style="height: 10px;"></td></tr>
+                <tr>
+                  <td style="padding: 15px; background-color: #333333; border-radius: 8px;">
+                    <p style="margin: 0; color: #667eea; font-size: 14px; font-weight: bold;">📍 VENUE</p>
+                    <p style="margin: 5px 0 0 0; color: #ffffff; font-size: 16px;">CJ&J Lounge, Suites and Apartment Ltd</p>
+                    <p style="margin: 5px 0 0 0; color: #cccccc; font-size: 14px;">184 NTA/Choba, Adjacent Open University</p>
+                    <p style="margin: 0; color: #cccccc; font-size: 14px;">Phalga, Port Harcourt 500272</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-              <!-- Welcome -->
-              <tr>
-                <td style="padding: 40px;">
-                  <h2 style="margin: 0 0 16px; color: #ffffff; font-size: 28px; font-weight: 700;">
-                    Welcome, ${name}! 🎉
-                  </h2>
-                  <p style="margin: 0 0 24px; color: rgba(255,255,255,0.7); font-size: 16px; line-height: 1.6;">
-                    Your <strong style="color: #FF006B; font-size: 18px; text-transform: uppercase;">${ticketType} TICKET</strong> is confirmed! 
-                    Get ready for an unforgettable night where boundaries blur, connections ignite, and Valentine's Day gets the celebration it truly deserves.
-                  </p>
-                </td>
-              </tr>
+          <!-- What Awaits You -->
+          <tr>
+            <td style="padding: 30px 20px; background-color: #1a1a1a;">
+              <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 24px; text-align: center;">What Awaits You</h2>
+              <ul style="margin: 0; padding: 0 0 0 20px; color: #cccccc; font-size: 16px; line-height: 1.8;">
+                <li>Premium DJ sets spinning the hottest tracks</li>
+                <li>Exclusive cocktails and premium drinks</li>
+                <li>Vibrant atmosphere with like-minded singles</li>
+                <li>Photo booth moments to capture the night</li>
+                <li>Surprise performances and entertainment</li>
+              </ul>
+            </td>
+          </tr>
 
-              <!-- Event Details -->
-              <tr>
-                <td style="padding: 0 40px 40px;">
-                  <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
-                    <tr>
-                      <td style="padding: 24px;">
-                        <table width="100%" cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                              <p style="margin: 0; color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">📅 Date</p>
-                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">Friday, February 14, 2026</p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                              <p style="margin: 0; color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">⏰ Time</p>
-                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">9:00 PM - 12:00 AM</p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                              <p style="margin: 0; color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">📍 Venue</p>
-                              <p style="margin: 4px 0 0; color: #FF006B; font-size: 16px; font-weight: 600; line-height: 1.5;">
-                                CJ&J Lounge, Suites and Apartment Ltd<br/>
-                                184 NTA/Choba, Adjacent Open University<br/>
-                                Phalga, Port Harcourt 500272
-                              </p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 12px 0;">
-                              <p style="margin: 0; color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">🎫 Ticket Type</p>
-                              <p style="margin: 4px 0 0; color: #FF006B; font-size: 18px; font-weight: 700; text-transform: uppercase;">${ticketType}</p>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
+          <!-- Entry Requirements -->
+          <tr>
+            <td style="padding: 30px 20px; background-color: #2a2a2a;">
+              <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 24px; text-align: center;">Entry Requirements</h2>
+              <div style="background-color: #333333; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 16px;">✓ Present this QR code at the entrance</p>
+                <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 16px;">✓ Valid ID required (18+ event)</p>
+                <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 16px;">✓ Dress code: Smart casual / Party attire</p>
+                <p style="margin: 0; color: #ffffff; font-size: 16px;">✓ Arrive early to avoid queues</p>
+              </div>
+            </td>
+          </tr>
 
-              <!-- QR Code -->
-              <tr>
-                <td style="padding: 0 40px 40px; text-align: center;">
-                  <div style="background: #ffffff; border-radius: 16px; padding: 24px; display: inline-block;">
-                    <img src="${qrCode}" alt="Your Ticket QR Code" style="width: 200px; height: 200px; display: block;" />
-                    <p style="margin: 16px 0 4px; color: #000000; font-size: 14px; font-weight: 700; letter-spacing: 1px;">
-                      ${name.toUpperCase()}
-                    </p>
-                    <p style="margin: 4px 0; color: #666666; font-size: 12px;">
-                      ${email}
-                    </p>
-                    <p style="margin: 8px 0 0; color: #FF006B; font-size: 12px; font-weight: 600; letter-spacing: 1px;">
-                      TICKET #${ticketId.slice(-8).toUpperCase()}
-                    </p>
-                  </div>
-                  <p style="margin: 16px 0 0; color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 600;">
-                    📱 Show this QR code at entry
-                  </p>
-                  <p style="margin: 8px 0 0; color: rgba(255,255,255,0.5); font-size: 12px;">
-                    Save this email or take a screenshot
-                  </p>
-                </td>
-              </tr>
+          <!-- Important Notice -->
+          <tr>
+            <td style="padding: 30px 20px; background-color: #1a1a1a; text-align: center;">
+              <div style="background-color: #ff6b6b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold;">⚠️ IMPORTANT</p>
+                <p style="margin: 5px 0 0 0; color: #ffffff; font-size: 14px;">This ticket is non-transferable and valid for single entry only. Screenshot or print this email for entry.</p>
+              </div>
+              
+              <p style="margin: 20px 0 10px 0; color: #999999; font-size: 14px;">Questions? Contact us:</p>
+              <p style="margin: 0; color: #667eea; font-size: 14px;">noreply.nolovershere@gmail.com</p>
+            </td>
+          </tr>
 
-              <!-- Important Info -->
-              <tr>
-                <td style="padding: 0 40px 40px;">
-                  <div style="background: rgba(255,0,107,0.1); border: 1px solid rgba(255,0,107,0.3); border-radius: 12px; padding: 20px;">
-                    <h3 style="margin: 0 0 12px; color: #FF006B; font-size: 16px; font-weight: 700;">
-                      ⚠️ Entry Requirements
-                    </h3>
-                    <ul style="margin: 0; padding-left: 20px; color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.8;">
-                      <li><strong>Valid ID required</strong> - Must be 18+ to enter</li>
-                      <li><strong>This QR code is your ticket</strong> - No code, no entry</li>
-                      <li><strong>Dress to impress</strong> - Provocative & elegant attire</li>
-                      <li><strong>Arrive on time</strong> - Doors open at 9:00 PM sharp</li>
-                      <li><strong>Respect & consent</strong> - Non-negotiable house rules</li>
-                    </ul>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- What to Expect -->
-              <tr>
-                <td style="padding: 0 40px 40px;">
-                  <h3 style="margin: 0 0 16px; color: #ffffff; font-size: 20px; font-weight: 700;">
-                    What Awaits You ✨
-                  </h3>
-                  <table width="100%" cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="padding: 12px 0;">
-                        <p style="margin: 0; color: #FF006B; font-size: 16px; font-weight: 600;">🎧 DJ Eros</p>
-                        <p style="margin: 4px 0 0; color: rgba(255,255,255,0.6); font-size: 14px;">Hypnotic beats that move your body and soul</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 12px 0;">
-                        <p style="margin: 0; color: #FF006B; font-size: 16px; font-weight: 600;">🍸 Premium Bar</p>
-                        <p style="margin: 4px 0 0; color: rgba(255,255,255,0.6); font-size: 14px;">Curated cocktails to set the mood</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 12px 0;">
-                        <p style="margin: 0; color: #FF006B; font-size: 16px; font-weight: 600;">✨ Intimate Spaces</p>
-                        <p style="margin: 4px 0 0; color: rgba(255,255,255,0.6); font-size: 14px;">Connection zones for those special moments</p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
-              <!-- Footer -->
-              <tr>
-                <td style="padding: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
-                  <p style="margin: 0 0 16px; color: rgba(255,255,255,0.5); font-size: 14px;">
-                    Questions or need assistance?
-                  </p>
-                  <p style="margin: 0; color: #FF006B; font-size: 16px; font-weight: 600;">
-                    📞 0903 439 9874
-                  </p>
-                  <p style="margin: 24px 0 0; color: rgba(255,255,255,0.4); font-size: 12px;">
-                    © 2026 NO LOVERS HERE. All rights reserved.<br/>
-                    This is your official ticket confirmation.
-                  </p>
-                </td>
-              </tr>
-
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px; background-color: #000000; text-align: center;">
+              <p style="margin: 0; color: #666666; font-size: 12px;">
+                © 2026 NO LOVERS HERE. All rights reserved.
+              </p>
+              <p style="margin: 10px 0 0 0; color: #666666; font-size: 12px;">
+                This is an automated email. Please do not reply.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
   `;
 
-  try {
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
-    return { success: true };
-  } catch (error) {
-    console.error('Email error:', error);
-    return { success: false, error };
+  // Use Brevo REST API directly instead of the problematic SDK
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': process.env.BREVO_API_KEY || '',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: {
+        name: process.env.BREVO_SENDER_NAME || 'NO LOVERS HERE',
+        email: process.env.BREVO_SENDER_EMAIL || 'noreply@example.com',
+      },
+      to: [
+        {
+          email: email,
+          name: name,
+        },
+      ],
+      subject: '🎉 Your NO LOVERS HERE Ticket - February 14, 2026',
+      htmlContent: emailHtml,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to send email: ${error}`);
   }
-}
 
-export async function sendBulkEmail(
-  recipients: { email: string; name: string }[],
-  subject: string,
-  htmlContent: string
-) {
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  sendSmtpEmail.subject = subject;
-  sendSmtpEmail.to = recipients;
-  sendSmtpEmail.sender = {
-    name: process.env.BREVO_SENDER_NAME || 'NO LOVERS HERE',
-    email: process.env.BREVO_SENDER_EMAIL || 'noreply@nolovershere.com'
-  };
-  sendSmtpEmail.htmlContent = htmlContent;
-
-  try {
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
-    return { success: true };
-  } catch (error) {
-    console.error('Bulk email error:', error);
-    return { success: false, error };
-  }
+  return response.json();
 }

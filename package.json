@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:push": "prisma db push",
@@ -17,8 +17,7 @@
     "next": "16.1.6",
     "qrcode": "^1.5.4",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "sib-api-v3-sdk": "^8.5.0"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

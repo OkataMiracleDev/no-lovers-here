@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  serverExternalPackages: ['sib-api-v3-sdk'],
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
