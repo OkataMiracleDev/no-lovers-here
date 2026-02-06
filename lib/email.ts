@@ -50,7 +50,7 @@ export async function sendTicketEmail(
                         <!-- Left: Logo -->
                         <td width="250" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; vertical-align: middle;">
                           <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 15px;">
-                            <img src="logo.png" alt="NO LOVERS HERE" style="width: 180px; height: auto; display: block;" />
+                            <h2 style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 28px; font-weight: 900; letter-spacing: 1px;">NO LOVERS HERE</h2>
                           </div>
                           <p style="margin: 0; color: white; font-size: 13px; font-weight: bold; letter-spacing: 1.5px;">DOWNLOAD YOUR TICKET</p>
                         </td>
