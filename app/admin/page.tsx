@@ -61,9 +61,9 @@ export default function AdminDashboard() {
       setTickets(data.tickets);
       setSettings(data.settings);
       if (data.settings) {
-        setMaxTickets(data.settings.maxTickets);
-        setMaxMenTickets(data.settings.maxMenTickets || data.settings.maxTickets);
-        setMaxWomenTickets(data.settings.maxWomenTickets || data.settings.maxTickets);
+        setMaxTickets(data.settings.maxTickets ?? 500);
+        setMaxMenTickets(data.settings.maxMenTickets ?? 250);
+        setMaxWomenTickets(data.settings.maxWomenTickets ?? 250);
         setMenPrice(data.settings.menTicketPrice);
         setWomenPrice(data.settings.womenTicketPrice);
       }
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
                         type="number"
                         value={maxMenTickets}
                         onChange={(e) => {
-                          const value = parseInt(e.target.value);
+                          const value = parseInt(e.target.value) || 0;
                           setMaxMenTickets(value);
                           setMaxTickets(value + maxWomenTickets);
                         }}
@@ -574,7 +574,7 @@ export default function AdminDashboard() {
                         type="number"
                         value={maxWomenTickets}
                         onChange={(e) => {
-                          const value = parseInt(e.target.value);
+                          const value = parseInt(e.target.value) || 0;
                           setMaxWomenTickets(value);
                           setMaxTickets(maxMenTickets + value);
                         }}

@@ -33,24 +33,29 @@ export async function PUT(request: NextRequest) {
 
     const { maxTickets, maxMenTickets, maxWomenTickets, menTicketPrice, womenTicketPrice } = await request.json();
 
+    console.log('Updating settings with:', { maxTickets, maxMenTickets, maxWomenTickets, menTicketPrice, womenTicketPrice });
+
+    // Ensure we use the provided values, even if they're 0
+    const updateData = {
+      maxTickets: maxTickets ?? 500,
+      maxMenTickets: maxMenTickets ?? 250,
+      maxWomenTickets: maxWomenTickets ?? 250,
+      menTicketPrice: menTicketPrice ?? 18000,
+      womenTicketPrice: womenTicketPrice ?? 8000,
+    };
+
+    console.log('Update data:', updateData);
+
     const settings = await prisma.settings.upsert({
       where: { settingsId: 'settings' },
-      update: { 
-        maxTickets,
-        maxMenTickets: maxMenTickets || maxTickets,
-        maxWomenTickets: maxWomenTickets || maxTickets,
-        menTicketPrice,
-        womenTicketPrice
-      },
+      update: updateData,
       create: { 
-        settingsId: 'settings', 
-        maxTickets,
-        maxMenTickets: maxMenTickets || maxTickets,
-        maxWomenTickets: maxWomenTickets || maxTickets,
-        menTicketPrice,
-        womenTicketPrice
+        settingsId: 'settings',
+        ...updateData
       },
     });
+
+    console.log('Settings updated:', settings);
 
     return NextResponse.json({ settings });
   } catch (error) {
