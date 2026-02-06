@@ -5,9 +5,9 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  // Generate ticket image with QR code
-  const { generateTicketImage } = await import('./ticket-generator');
-  const ticketImageData = await generateTicketImage(name, email, ticketType, ticketId, qrCodeData);
+  // Generate ticket image with QR code using SVG
+  const { generateTicketDataURL } = await import('./ticket-generator');
+  const ticketImageData = await generateTicketDataURL(name, email, ticketType, ticketId, qrCodeData);
   
   const emailHtml = `
 <!DOCTYPE html>
