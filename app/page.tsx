@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -79,19 +80,19 @@ export default function Home() {
           })
           .then(res => res.json())
           .then(data => {
+            setIsPaymentLoading(false);
             if (data.success) {
-              alert('🎉 Payment successful! Check your email for your ticket.');
+              setShowSuccessModal(true);
               setEmail('');
               setName('');
               setQuantity(1);
             } else {
-              alert('Payment verification failed. Please contact support.');
+              alert('Payment verification failed. Please contact support with reference: ' + response.reference);
             }
-            setIsPaymentLoading(false);
           })
           .catch(() => {
-            alert('Error verifying payment. Please contact support with reference: ' + response.reference);
             setIsPaymentLoading(false);
+            alert('Error verifying payment. Please contact support with reference: ' + response.reference);
           });
         },
         onClose: function() {
@@ -108,6 +109,70 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-in zoom-in duration-300">
+            {/* Success Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center animate-in zoom-in duration-500">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            <h2 className="text-3xl font-bold text-center mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Payment Successful!
+            </h2>
+            <p className="text-gray-600 text-center mb-6 text-lg">
+              Your ticket has been sent to your email
+            </p>
+
+            {/* Details */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border border-purple-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Check your inbox</p>
+                  <p className="text-gray-900 font-semibold">Ticket sent via email</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Your QR code</p>
+                  <p className="text-gray-900 font-semibold">Ready for entry</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Got it!
+            </button>
+
+            {/* Additional Info */}
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Can't find the email? Check your spam folder
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Email Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
