@@ -38,8 +38,8 @@ export async function sendTicketEmail(
               <div style="background: #ffffff; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
                 <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; display: block; border-radius: 8px;" />
               </div>
-              <p style="margin: 20px 0 10px 0; color: #666666; font-size: 14px;">Save this ticket to your phone or print it</p>
-              <a href="#" style="display: inline-block; margin-top: 10px; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">Download Ticket</a>
+              <p style="margin: 20px 0 5px 0; color: #666666; font-size: 14px;">📎 Ticket attached as PNG file</p>
+              <p style="margin: 0; color: #999999; font-size: 12px;">Download the attachment to save to your phone or print it</p>
             </td>
           </tr>
 
