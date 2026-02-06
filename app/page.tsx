@@ -281,7 +281,7 @@ export default function Home() {
       {/* Minimal Nav */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Image src="/logo.png" alt="NLH" width={60} height={20} className="object-contain" unoptimized />
+          <Image src="/logo.png" alt="NO LOVERS HERE Logo" width={60} height={20} className="object-contain" priority />
           <a href="#tickets" className="px-6 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors">
             Get Tickets
           </a>
@@ -306,13 +306,13 @@ export default function Home() {
           {/* Hero Image Grid */}
           <div className="grid md:grid-cols-3 gap-4 mb-12">
             <div className="relative h-64 rounded-2xl overflow-hidden">
-              <Image src="/1.jpg" alt="Event" fill className="object-cover" />
+              <Image src="/1.jpg" alt="NO LOVERS HERE Event Atmosphere" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="relative h-64 rounded-2xl overflow-hidden">
-              <Image src="/2.jpg" alt="Event" fill className="object-cover" />
+              <Image src="/2.jpg" alt="NO LOVERS HERE Party Vibes" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="relative h-64 rounded-2xl overflow-hidden">
-              <Image src="/3.jpg" alt="Event" fill className="object-cover" />
+              <Image src="/3.jpg" alt="NO LOVERS HERE Nightlife" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
           </div>
 
@@ -363,7 +363,15 @@ export default function Home() {
         <div className="max-w-2xl mx-auto">
           <h2 className="text-4xl font-black text-center mb-12">Event Details</h2>
           <div className="relative rounded-2xl overflow-hidden shadow-xl">
-            <Image src="/flyer.png" alt="Event Flyer" width={400} height={300} className="w-full h-auto" />
+            <Image 
+              src="/flyer.png" 
+              alt="NO LOVERS HERE Valentine's Day 2026 Event Flyer - February 14 at CJ&J Lounge Port Harcourt" 
+              width={1200} 
+              height={630} 
+              className="w-full h-auto" 
+              priority
+              sizes="(max-width: 768px) 100vw, 800px"
+            />
           </div>
         </div>
       </section>
@@ -544,7 +552,7 @@ export default function Home() {
       {/* Footer - Clean */}
       <footer className="py-16 px-6 bg-gray-50 border-t border-gray-100">
         <div className="max-w-6xl mx-auto text-center">
-          <Image src="/logo.png" alt="NLH" width={140} height={45} className="mx-auto mb-8 object-contain" unoptimized />
+          <Image src="/logo.png" alt="NO LOVERS HERE Logo" width={140} height={45} className="mx-auto mb-8 object-contain" loading="lazy" />
           <div className="mb-6">
             <h3 className="text-xl font-bold mb-3">Questions?</h3>
             <a href="tel:09034399874" className="text-red-600 text-lg font-semibold hover:text-red-700">

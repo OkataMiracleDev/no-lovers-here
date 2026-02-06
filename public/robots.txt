@@ -1,0 +1,9 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin
+
+# Sitemap
+Sitemap: https://no-lovers-here.vercel.app/sitemap.xml
