@@ -5,6 +5,10 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
+  // Generate ticket PNG
+  const { generateTicketPNG } = await import('./ticket-generator');
+  const ticketPNGBase64 = await generateTicketPNG(name, email, ticketType, ticketId, qrCodeData);
+  
   const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -33,65 +37,16 @@ export async function sendTicketEmail(
               <!-- Ticket Container -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 3px;">
                 <tr>
-                  <td style="background: white; border-radius: 14px; padding: 30px;">
-                    
-                    <!-- QR Code Section -->
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td align="center" style="padding-bottom: 25px;">
-                          <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; display: inline-block;">
-                            <img src="${qrCodeData}" alt="QR Code" width="200" height="200" style="display: block;" />
-                          </div>
-                          <p style="margin: 15px 0 0 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Scan at Entrance</p>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <!-- Ticket Details -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-top: 2px solid #e9ecef; padding-top: 20px;">
-                      <tr>
-                        <td style="padding: 12px 0;">
-                          <p style="margin: 0 0 5px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Name</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">${name}</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0;">
-                          <table width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                              <td width="48%">
-                                <p style="margin: 0 0 5px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase;">Type</p>
-                                <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">${ticketType}</p>
-                              </td>
-                              <td width="4%"></td>
-                              <td width="48%">
-                                <p style="margin: 0 0 5px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase;">Date</p>
-                                <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">Feb 14, 2026</p>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0;">
-                          <p style="margin: 0 0 5px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase;">Time</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">9:00 PM - 12:00 AM</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0 0 0;">
-                          <p style="margin: 0; color: #999999; font-size: 10px;">Ticket ID: ${ticketId}</p>
-                        </td>
-                      </tr>
-                    </table>
-
+                  <td style="background: white; border-radius: 14px; padding: 20px; text-align: center;">
+                    <!-- Ticket Image -->
+                    <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; border-radius: 8px;" />
                   </td>
                 </tr>
               </table>
 
               <!-- Save Instructions -->
               <p style="margin: 25px 0 15px 0; color: #666666; font-size: 14px; text-align: center; font-weight: 600;">
-                📱 Save this ticket to your phone or take a screenshot
+                📱 Download the attached ticket image or screenshot this email
               </p>
             </td>
           </tr>
@@ -180,6 +135,18 @@ export async function sendTicketEmail(
       ],
       subject: '🎉 Your NO LOVERS HERE Ticket - February 14, 2026',
       htmlContent: emailHtml,
+      attachment: [
+        {
+          name: 'NO-LOVERS-HERE-Ticket.png',
+          content: ticketPNGBase64,
+        },
+      ],
+      inlineImages: [
+        {
+          name: 'ticket.png',
+          content: ticketPNGBase64,
+        },
+      ],
     }),
   });
 
