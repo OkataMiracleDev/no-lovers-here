@@ -5,10 +5,6 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  // Generate ticket PNG with QR code
-  const { generateTicketPNG } = await import('./ticket-generator');
-  const ticketImageBase64 = await generateTicketPNG(name, email, ticketType, ticketId, qrCodeData);
-  
   const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -31,15 +27,63 @@ export async function sendTicketEmail(
             </td>
           </tr>
 
-          <!-- Ticket Image -->
+          <!-- Ticket Card -->
           <tr>
-            <td style="padding: 40px 30px; text-align: center; background-color: #fafafa;">
-              <p style="margin: 0 0 20px 0; color: #333333; font-size: 18px; font-weight: 600;">Your Digital Ticket</p>
-              <div style="background: #ffffff; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-                <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; display: block; border-radius: 8px;" />
-              </div>
-              <p style="margin: 20px 0 5px 0; color: #666666; font-size: 14px;">📎 Ticket attached as PNG file</p>
-              <p style="margin: 0; color: #999999; font-size: 12px;">Download the attachment to save to your phone or print it</p>
+            <td style="padding: 40px 30px; background-color: #fafafa;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td style="padding: 30px;">
+                    <!-- QR Code Section -->
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                          <div style="background: #ffffff; padding: 20px; border-radius: 12px; display: inline-block;">
+                            <img src="${qrCodeData}" alt="QR Code" width="200" height="200" style="display: block;" />
+                          </div>
+                          <p style="margin: 15px 0 0 0; color: #ffffff; font-size: 14px; font-weight: 700; letter-spacing: 1px;">SCAN AT ENTRANCE</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Ticket Details -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px);">
+                      <tr>
+                        <td style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                          <p style="margin: 0 0 5px 0; color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Name</p>
+                          <p style="margin: 0; color: #ffffff; font-size: 18px; font-weight: 700;">${name}</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td width="50%">
+                                <p style="margin: 0 0 5px 0; color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600; text-transform: uppercase;">Ticket Type</p>
+                                <p style="margin: 0; color: #ffffff; font-size: 16px; font-weight: 700;">${ticketType}</p>
+                              </td>
+                              <td width="50%">
+                                <p style="margin: 0 0 5px 0; color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600; text-transform: uppercase;">Date</p>
+                                <p style="margin: 0; color: #ffffff; font-size: 16px; font-weight: 700;">Feb 14, 2026</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-top: 15px;">
+                          <p style="margin: 0 0 5px 0; color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600; text-transform: uppercase;">Time</p>
+                          <p style="margin: 0; color: #ffffff; font-size: 16px; font-weight: 700;">9:00 PM - 12:00 AM</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Ticket ID -->
+                    <p style="margin: 15px 0 0 0; color: rgba(255,255,255,0.6); font-size: 10px; text-align: center;">Ticket ID: ${ticketId}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 20px 0 0 0; color: #666666; font-size: 13px; text-align: center;">📱 Screenshot this ticket or save this email</p>
             </td>
           </tr>
 
@@ -80,7 +124,7 @@ export async function sendTicketEmail(
               <div style="background-color: #fff3cd; padding: 20px; border-radius: 12px; border-left: 4px solid #ffc107;">
                 <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px; font-weight: 700;">⚠️ IMPORTANT</p>
                 <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">
-                  • Present this ticket at the entrance<br/>
+                  • Present this QR code at the entrance<br/>
                   • Valid ID required (18+ event)<br/>
                   • Smart casual dress code<br/>
                   • Non-transferable ticket
@@ -127,18 +171,6 @@ export async function sendTicketEmail(
       ],
       subject: '🎉 Your NO LOVERS HERE Ticket - February 14, 2026',
       htmlContent: emailHtml,
-      attachment: [
-        {
-          name: 'NO-LOVERS-HERE-Ticket.png',
-          content: ticketImageBase64,
-        },
-      ],
-      inlineImages: [
-        {
-          name: 'ticket.png',
-          content: ticketImageBase64,
-        },
-      ],
     }),
   });
 
