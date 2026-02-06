@@ -40,7 +40,7 @@ export async function sendTicketEmail(
 
           <!-- Ticket Card -->
           <tr>
-            <td style="padding: 40px 30px; background-color: #fafafa;">
+            <td style="padding: 40px 40px; background-color: #fafafa;">
               <!-- Ticket Container -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; overflow: hidden;">
                 <tr>
@@ -50,7 +50,7 @@ export async function sendTicketEmail(
                         <!-- Left: Logo -->
                         <td width="250" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; vertical-align: middle;">
                           <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 15px;">
-                            <img src="cid:logo" alt="NO LOVERS HERE" style="width: 180px; height: auto; display: block;" />
+                            <img src="logo.png" alt="NO LOVERS HERE" style="width: 180px; height: auto; display: block;" />
                           </div>
                           <p style="margin: 0; color: white; font-size: 13px; font-weight: bold; letter-spacing: 1.5px;">DOWNLOAD YOUR TICKET</p>
                         </td>
