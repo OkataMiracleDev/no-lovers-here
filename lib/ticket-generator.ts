@@ -1,337 +1,184 @@
-import satori from 'satori';
-import sharp from 'sharp';
-
-export async function generateTicketPNG(
+export async function generateTicketHTML(
   name: string,
   email: string,
   ticketType: string,
   ticketId: string,
   qrCodeDataUrl: string
 ): Promise<string> {
-  try {
-    // Create the ticket using Satori (React-like JSX to SVG)
-    const svg = await satori(
-      {
-        type: 'div',
-        props: {
-          style: {
-            width: '800px',
-            height: '400px',
-            display: 'flex',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '20px',
-          },
-          children: [
-            {
-              type: 'div',
-              props: {
-                style: {
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  background: 'white',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                },
-                children: [
-                  // Left section with QR code
-                  {
-                    type: 'div',
-                    props: {
-                      style: {
-                        width: '300px',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '30px',
-                      },
-                      children: [
-                        {
-                          type: 'div',
-                          props: {
-                            style: {
-                              background: 'white',
-                              padding: '20px',
-                              borderRadius: '12px',
-                              marginBottom: '20px',
-                            },
-                            children: [
-                              {
-                                type: 'img',
-                                props: {
-                                  src: qrCodeDataUrl,
-                                  width: 220,
-                                  height: 220,
-                                  style: {
-                                    display: 'block',
-                                  },
-                                },
-                              },
-                            ],
-                          },
-                        },
-                        {
-                          type: 'div',
-                          props: {
-                            style: {
-                              color: 'white',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              letterSpacing: '1px',
-                            },
-                            children: 'SCAN AT ENTRANCE',
-                          },
-                        },
-                      ],
-                    },
-                  },
-                  // Right section with details
-                  {
-                    type: 'div',
-                    props: {
-                      style: {
-                        flex: 1,
-                        padding: '40px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      },
-                      children: [
-                        {
-                          type: 'div',
-                          props: {
-                            style: {
-                              display: 'flex',
-                              flexDirection: 'column',
-                            },
-                            children: [
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    fontSize: '32px',
-                                    fontWeight: 'bold',
-                                    color: '#1a1a1a',
-                                    marginBottom: '10px',
-                                  },
-                                  children: 'NO LOVERS HERE',
-                                },
-                              },
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    width: '100%',
-                                    height: '3px',
-                                    background: '#667eea',
-                                    marginBottom: '20px',
-                                  },
-                                },
-                              },
-                              // Name
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    marginBottom: '20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                  },
-                                  children: [
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '14px',
-                                          fontWeight: 'bold',
-                                          color: '#667eea',
-                                          marginBottom: '5px',
-                                        },
-                                        children: 'NAME',
-                                      },
-                                    },
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '20px',
-                                          fontWeight: '600',
-                                          color: '#1a1a1a',
-                                        },
-                                        children: name.substring(0, 25),
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                              // Ticket Type
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    marginBottom: '20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                  },
-                                  children: [
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '14px',
-                                          fontWeight: 'bold',
-                                          color: '#667eea',
-                                          marginBottom: '5px',
-                                        },
-                                        children: 'TICKET TYPE',
-                                      },
-                                    },
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '20px',
-                                          fontWeight: '600',
-                                          color: '#1a1a1a',
-                                        },
-                                        children: ticketType,
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                              // Date
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    marginBottom: '20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                  },
-                                  children: [
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '14px',
-                                          fontWeight: 'bold',
-                                          color: '#667eea',
-                                          marginBottom: '5px',
-                                        },
-                                        children: 'DATE',
-                                      },
-                                    },
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '20px',
-                                          fontWeight: '600',
-                                          color: '#1a1a1a',
-                                        },
-                                        children: 'February 14, 2026',
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                              // Time
-                              {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                  },
-                                  children: [
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '14px',
-                                          fontWeight: 'bold',
-                                          color: '#667eea',
-                                          marginBottom: '5px',
-                                        },
-                                        children: 'TIME',
-                                      },
-                                    },
-                                    {
-                                      type: 'div',
-                                      props: {
-                                        style: {
-                                          fontSize: '20px',
-                                          fontWeight: '600',
-                                          color: '#1a1a1a',
-                                        },
-                                        children: '9:00 PM - 12:00 AM',
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            ],
-                          },
-                        },
-                        // Ticket ID
-                        {
-                          type: 'div',
-                          props: {
-                            style: {
-                              fontSize: '10px',
-                              color: '#999999',
-                              textAlign: 'center',
-                              marginTop: '10px',
-                            },
-                            children: `Ticket ID: ${ticketId.substring(0, 30)}`,
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      {
-        width: 800,
-        height: 400,
-        fonts: [
-          {
-            name: 'Inter',
-            data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff').then(res => res.arrayBuffer()),
-            weight: 400,
-            style: 'normal',
-          },
-          {
-            name: 'Inter',
-            data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff').then(res => res.arrayBuffer()),
-            weight: 600,
-            style: 'normal',
-          },
-          {
-            name: 'Inter',
-            data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff').then(res => res.arrayBuffer()),
-            weight: 700,
-            style: 'normal',
-          },
-        ],
-      }
-    );
+  // Create an HTML-based ticket that will be converted to image
+  // Using simple HTML/CSS that renders well as an image
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      width: 800px;
+      height: 400px;
+      overflow: hidden;
+    }
+    
+    .ticket-container {
+      width: 800px;
+      height: 400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      display: flex;
+    }
+    
+    .ticket-inner {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .left-section {
+      width: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+    
+    .qr-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .qr-box img {
+      width: 220px;
+      height: 220px;
+      display: block;
+    }
+    
+    .scan-text {
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 1.5px;
+    }
+    
+    .right-section {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .event-title {
+      font-size: 36px;
+      font-weight: 900;
+      color: #1a1a1a;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    
+    .divider {
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+      margin-bottom: 25px;
+    }
+    
+    .info-row {
+      margin-bottom: 22px;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    
+    .info-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .ticket-id {
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket-container">
+    <div class="ticket-inner">
+      <div class="left-section">
+        <div class="qr-box">
+          <img src="${qrCodeDataUrl}" alt="QR Code">
+        </div>
+        <div class="scan-text">SCAN AT ENTRANCE</div>
+      </div>
+      <div class="right-section">
+        <div>
+          <div class="event-title">NO LOVERS HERE</div>
+          <div class="divider"></div>
+          
+          <div class="info-row">
+            <div class="info-label">NAME</div>
+            <div class="info-value">${name}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">TICKET TYPE</div>
+            <div class="info-value">${ticketType}</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">DATE</div>
+            <div class="info-value">February 14, 2026</div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">TIME</div>
+            <div class="info-value">9:00 PM - 12:00 AM</div>
+          </div>
+        </div>
+        
+        <div class="ticket-id">Ticket ID: ${ticketId}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
 
-    // Convert SVG to PNG
-    const pngBuffer = await sharp(Buffer.from(svg))
-      .png()
-      .toBuffer();
-
-    return pngBuffer.toString('base64');
-  } catch (error) {
-    console.error('Error generating ticket:', error);
-    throw error;
-  }
+// For email attachment, we'll just use the QR code with text overlay
+export async function generateSimpleTicketImage(
+  name: string,
+  ticketType: string,
+  ticketId: string,
+  qrCodeDataUrl: string
+): Promise<string> {
+  // Return the QR code data URL as-is
+  // The email will handle the display
+  return qrCodeDataUrl;
 }
