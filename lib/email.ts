@@ -5,6 +5,10 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
+  // Generate ticket image with QR code
+  const { generateTicketImage } = await import('./ticket-generator');
+  const ticketImageData = await generateTicketImage(name, email, ticketType, ticketId, qrCodeData);
+  
   const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -27,51 +31,21 @@ export async function sendTicketEmail(
             </td>
           </tr>
 
-          <!-- QR Code -->
+          <!-- Ticket Image -->
           <tr>
             <td style="padding: 40px 30px; text-align: center; background-color: #fafafa;">
-              <p style="margin: 0 0 20px 0; color: #333333; font-size: 18px; font-weight: 600;">Scan this QR code at the entrance</p>
+              <p style="margin: 0 0 20px 0; color: #333333; font-size: 18px; font-weight: 600;">Your Digital Ticket</p>
               <div style="background: #ffffff; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-                <img src="${qrCodeData}" alt="QR Code" width="250" height="250" style="display: block; border-radius: 8px;" />
+                <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; display: block; border-radius: 8px;" />
               </div>
-            </td>
-          </tr>
-
-          <!-- Ticket Details -->
-          <tr>
-            <td style="padding: 30px;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-                    <p style="margin: 0 0 5px 0; color: #666666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Name</p>
-                    <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">${name}</p>
-                  </td>
-                </tr>
-                <tr><td style="height: 10px;"></td></tr>
-                <tr>
-                  <td>
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td width="48%" style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-                          <p style="margin: 0 0 5px 0; color: #666666; font-size: 12px; text-transform: uppercase;">Type</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">${ticketType}</p>
-                        </td>
-                        <td width="4%"></td>
-                        <td width="48%" style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-                          <p style="margin: 0 0 5px 0; color: #666666; font-size: 12px; text-transform: uppercase;">Email</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 14px; font-weight: 600; word-break: break-all;">${email}</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+              <p style="margin: 20px 0 10px 0; color: #666666; font-size: 14px;">Save this ticket to your phone or print it</p>
+              <a href="#" style="display: inline-block; margin-top: 10px; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">Download Ticket</a>
             </td>
           </tr>
 
           <!-- Event Details -->
           <tr>
-            <td style="padding: 0 30px 30px 30px;">
+            <td style="padding: 30px;">
               <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #667eea;">
                 <h2 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 20px; font-weight: 700;">Event Details</h2>
                 
@@ -106,7 +80,7 @@ export async function sendTicketEmail(
               <div style="background-color: #fff3cd; padding: 20px; border-radius: 12px; border-left: 4px solid #ffc107;">
                 <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px; font-weight: 700;">⚠️ IMPORTANT</p>
                 <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">
-                  • Present this QR code at the entrance<br/>
+                  • Present this ticket at the entrance<br/>
                   • Valid ID required (18+ event)<br/>
                   • Smart casual dress code<br/>
                   • Non-transferable ticket
@@ -153,6 +127,18 @@ export async function sendTicketEmail(
       ],
       subject: '🎉 Your NO LOVERS HERE Ticket - February 14, 2026',
       htmlContent: emailHtml,
+      attachment: [
+        {
+          name: 'ticket.png',
+          content: ticketImageData.split(',')[1], // Remove data:image/png;base64, prefix
+        },
+      ],
+      inlineImages: [
+        {
+          name: 'ticket.png',
+          content: ticketImageData.split(',')[1], // Remove data:image/png;base64, prefix
+        },
+      ],
     }),
   });
 
