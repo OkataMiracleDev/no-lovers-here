@@ -5,9 +5,8 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  // Generate ticket PNG
-  const { generateTicketPNG } = await import('./ticket-generator');
-  const ticketPNGBase64 = await generateTicketPNG(name, email, ticketType, ticketId, qrCodeData);
+  // Extract base64 from data URL (remove "data:image/png;base64," prefix)
+  const qrBase64 = qrCodeData.split(',')[1];
   
   const emailHtml = `
 <!DOCTYPE html>
@@ -35,18 +34,62 @@ export async function sendTicketEmail(
           <tr>
             <td style="padding: 40px 30px; background-color: #fafafa;">
               <!-- Ticket Container -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 3px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; overflow: hidden;">
                 <tr>
-                  <td style="background: white; border-radius: 14px; padding: 20px; text-align: center;">
-                    <!-- Ticket Image -->
-                    <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; border-radius: 8px;" />
+                  <td>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <!-- Left: QR Code -->
+                        <td width="250" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; vertical-align: middle;">
+                          <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 15px;">
+                            <img src="cid:qrcode" alt="QR Code" style="width: 200px; height: 200px; display: block;" />
+                          </div>
+                          <p style="margin: 0; color: white; font-size: 13px; font-weight: bold; letter-spacing: 1.5px;">SCAN AT ENTRANCE</p>
+                        </td>
+                        
+                        <!-- Right: Ticket Details -->
+                        <td style="background: white; padding: 30px; vertical-align: top;">
+                          <h2 style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 28px; font-weight: 900; letter-spacing: 1px;">NO LOVERS HERE</h2>
+                          <div style="width: 100%; height: 3px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; margin-bottom: 20px;"></div>
+                          
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding-bottom: 15px;">
+                                <p style="margin: 0 0 4px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">NAME</p>
+                                <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">${name}</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding-bottom: 15px;">
+                                <p style="margin: 0 0 4px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">TICKET TYPE</p>
+                                <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">${ticketType}</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding-bottom: 15px;">
+                                <p style="margin: 0 0 4px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">DATE</p>
+                                <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">February 14, 2026</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <p style="margin: 0 0 4px 0; color: #667eea; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">TIME</p>
+                                <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 600;">9:00 PM - 12:00 AM</p>
+                              </td>
+                            </tr>
+                          </table>
+                          
+                          <p style="margin: 15px 0 0 0; color: #999999; font-size: 10px; text-align: center;">Ticket ID: ${ticketId}</p>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
 
               <!-- Save Instructions -->
               <p style="margin: 25px 0 15px 0; color: #666666; font-size: 14px; text-align: center; font-weight: 600;">
-                📱 Download the attached ticket image or screenshot this email
+                📱 Screenshot this email or download the attached QR code
               </p>
             </td>
           </tr>
@@ -137,14 +180,14 @@ export async function sendTicketEmail(
       htmlContent: emailHtml,
       attachment: [
         {
-          name: 'NO-LOVERS-HERE-Ticket.png',
-          content: ticketPNGBase64,
+          name: `NO-LOVERS-HERE-QR-${ticketId}.png`,
+          content: qrBase64,
         },
       ],
       inlineImages: [
         {
-          name: 'ticket.png',
-          content: ticketPNGBase64,
+          name: 'qrcode.png',
+          content: qrBase64,
         },
       ],
     }),
