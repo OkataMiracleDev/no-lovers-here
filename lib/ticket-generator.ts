@@ -1,4 +1,17 @@
-import { createCanvas, loadImage, CanvasRenderingContext2D as NodeCanvasContext } from 'canvas';
+import { createCanvas, loadImage, registerFont, CanvasRenderingContext2D as NodeCanvasContext } from 'canvas';
+import path from 'path';
+
+// Register Arial font from @canvas-fonts/arial
+try {
+  const arialPath = path.join(process.cwd(), 'node_modules/@canvas-fonts/arial/Arial.ttf');
+  const arialBoldPath = path.join(process.cwd(), 'node_modules/@canvas-fonts/arial/Arial Bold.ttf');
+  
+  registerFont(arialPath, { family: 'Arial' });
+  registerFont(arialBoldPath, { family: 'Arial', weight: 'bold' });
+  console.log('Arial fonts registered successfully');
+} catch (error) {
+  console.error('Failed to register Arial fonts:', error);
+}
 
 export async function generateTicketImage(
   name: string,
@@ -69,7 +82,7 @@ export async function generateTicketImage(
   ctx.font = 'bold 11px Arial';
   ctx.fillText('NAME', 330, yPos);
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '600 20px Arial';
+  ctx.font = 'bold 20px Arial';
   ctx.fillText(name, 330, yPos + 20);
 
   yPos += 50;
@@ -79,7 +92,7 @@ export async function generateTicketImage(
   ctx.font = 'bold 11px Arial';
   ctx.fillText('TICKET TYPE', 330, yPos);
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '600 20px Arial';
+  ctx.font = 'bold 20px Arial';
   ctx.fillText(ticketType, 330, yPos + 20);
 
   yPos += 50;
@@ -89,7 +102,7 @@ export async function generateTicketImage(
   ctx.font = 'bold 11px Arial';
   ctx.fillText('DATE', 330, yPos);
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '600 20px Arial';
+  ctx.font = 'bold 20px Arial';
   ctx.fillText('February 14, 2026', 330, yPos + 20);
 
   yPos += 50;
@@ -99,7 +112,7 @@ export async function generateTicketImage(
   ctx.font = 'bold 11px Arial';
   ctx.fillText('TIME', 330, yPos);
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = '600 20px Arial';
+  ctx.font = 'bold 20px Arial';
   ctx.fillText('9:00 PM - 12:00 AM', 330, yPos + 20);
 
   // Ticket ID at bottom

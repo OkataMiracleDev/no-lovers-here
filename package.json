@@ -12,6 +12,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@canvas-fonts/arial": "^1.0.4",
     "@prisma/client": "^6.1.0",
     "canvas": "^3.2.1",
     "mongodb": "^7.0.0",
