@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  serverExternalPackages: ['canvas'],
 };
 
 export default nextConfig;

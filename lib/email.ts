@@ -5,7 +5,11 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  // Extract base64 from data URL (remove "data:image/png;base64," prefix)
+  // Generate full ticket image with QR code
+  const { generateTicketImage } = await import('./ticket-generator');
+  const ticketImageBase64 = await generateTicketImage(name, ticketType, ticketId, qrCodeData);
+  
+  // Extract base64 from QR data URL for inline display
   const qrBase64 = qrCodeData.split(',')[1];
   
   const emailHtml = `
@@ -89,7 +93,7 @@ export async function sendTicketEmail(
 
               <!-- Save Instructions -->
               <p style="margin: 25px 0 15px 0; color: #666666; font-size: 14px; text-align: center; font-weight: 600;">
-                📱 Screenshot this email or download the attached QR code
+                📱 Download the attached ticket image or screenshot this email
               </p>
             </td>
           </tr>
@@ -180,8 +184,8 @@ export async function sendTicketEmail(
       htmlContent: emailHtml,
       attachment: [
         {
-          name: `NO-LOVERS-HERE-QR-${ticketId}.png`,
-          content: qrBase64,
+          name: `NO-LOVERS-HERE-Ticket-${ticketId}.png`,
+          content: ticketImageBase64,
         },
       ],
       inlineImages: [
