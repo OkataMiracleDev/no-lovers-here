@@ -13,20 +13,39 @@ export default function Home() {
   const [selectedTicket, setSelectedTicket] = useState<{ amount: number; type: string } | null>(null);
   const [menPrice, setMenPrice] = useState(18000);
   const [womenPrice, setWomenPrice] = useState(8000);
+  const [menAvailable, setMenAvailable] = useState(999);
+  const [womenAvailable, setWomenAvailable] = useState(999);
 
   useEffect(() => {
-    fetch('/api/settings')
-      .then(res => res.json())
-      .then(data => {
-        setMenPrice(data.menTicketPrice);
-        setWomenPrice(data.womenTicketPrice);
-      })
-      .catch(() => {
-        // Use defaults if fetch fails
-      });
+    // Fetch ticket availability and prices
+    const fetchAvailability = () => {
+      fetch('/api/ticket-availability')
+        .then(res => res.json())
+        .then(data => {
+          setMenPrice(data.menPrice);
+          setWomenPrice(data.womenPrice);
+          setMenAvailable(data.menAvailable);
+          setWomenAvailable(data.womenAvailable);
+        })
+        .catch(() => {
+          // Use defaults if fetch fails
+        });
+    };
+
+    fetchAvailability();
+    // Refresh availability every 30 seconds
+    const interval = setInterval(fetchAvailability, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const openEmailModal = (amount: number, ticketType: string) => {
+    // Check if tickets are available
+    const available = ticketType === 'Men' ? menAvailable : womenAvailable;
+    if (available <= 0) {
+      alert('Sorry, this ticket type is sold out!');
+      return;
+    }
+
     setSelectedTicket({ amount, type: ticketType });
     setQuantity(1);
     setShowEmailModal(true);
@@ -359,13 +378,21 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Men */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-red-600 transition-colors">
+            <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-red-600 transition-colors relative">
+              {menAvailable <= 0 && (
+                <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  SOLD OUT
+                </div>
+              )}
               <div className="mb-6">
                 <span className="inline-block px-3 py-1 bg-red-50 text-red-600 text-xs font-bold uppercase rounded-full">Men</span>
               </div>
               <div className="mb-6">
                 <div className="text-5xl font-black mb-2">₦{menPrice.toLocaleString()}</div>
                 <p className="text-gray-500">Per ticket</p>
+                {menAvailable > 0 && menAvailable <= 10 && (
+                  <p className="text-amber-600 text-sm font-semibold mt-2">Only {menAvailable} left!</p>
+                )}
               </div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-center gap-2">
@@ -395,21 +422,33 @@ export default function Home() {
               </ul>
               <button
                 onClick={() => openEmailModal(menPrice, 'Men')}
-                disabled={isPaymentLoading}
-                className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                disabled={isPaymentLoading || menAvailable <= 0}
+                className={`w-full py-3 font-semibold rounded-lg transition-colors ${
+                  menAvailable <= 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                } disabled:opacity-50`}
               >
-                Buy Now
+                {menAvailable <= 0 ? 'SOLD OUT' : 'Buy Now'}
               </button>
             </div>
 
             {/* Women */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-red-600 transition-colors">
+            <div className="bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-red-600 transition-colors relative">
+              {womenAvailable <= 0 && (
+                <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  SOLD OUT
+                </div>
+              )}
               <div className="mb-6">
                 <span className="inline-block px-3 py-1 bg-red-50 text-red-600 text-xs font-bold uppercase rounded-full">Women</span>
               </div>
               <div className="mb-6">
                 <div className="text-5xl font-black mb-2">₦{womenPrice.toLocaleString()}</div>
                 <p className="text-gray-500">Per ticket</p>
+                {womenAvailable > 0 && womenAvailable <= 10 && (
+                  <p className="text-amber-600 text-sm font-semibold mt-2">Only {womenAvailable} left!</p>
+                )}
               </div>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-center gap-2">
@@ -439,10 +478,14 @@ export default function Home() {
               </ul>
               <button
                 onClick={() => openEmailModal(womenPrice, 'Women')}
-                disabled={isPaymentLoading}
-                className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                disabled={isPaymentLoading || womenAvailable <= 0}
+                className={`w-full py-3 font-semibold rounded-lg transition-colors ${
+                  womenAvailable <= 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                } disabled:opacity-50`}
               >
-                Buy Now
+                {womenAvailable <= 0 ? 'SOLD OUT' : 'Buy Now'}
               </button>
             </div>
           </div>

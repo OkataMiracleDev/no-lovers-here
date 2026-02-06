@@ -117,6 +117,26 @@ export async function POST(request: NextRequest) {
 
     console.log('Settings:', settings);
 
+    // Check if tickets are available for this type
+    const menAvailable = settings.maxMenTickets - settings.menTicketsSold;
+    const womenAvailable = settings.maxWomenTickets - settings.womenTicketsSold;
+    
+    console.log('Availability:', { menAvailable, womenAvailable, ticketType, quantity });
+
+    if (ticketType === 'Men' && menAvailable < quantity) {
+      return NextResponse.json(
+        { error: `Only ${menAvailable} men's tickets available`, available: menAvailable },
+        { status: 400 }
+      );
+    }
+
+    if (ticketType === 'Women' && womenAvailable < quantity) {
+      return NextResponse.json(
+        { error: `Only ${womenAvailable} women's tickets available`, available: womenAvailable },
+        { status: 400 }
+      );
+    }
+
     const totalSold = settings.menTicketsSold + settings.womenTicketsSold;
     if (totalSold >= settings.maxTickets) {
       return NextResponse.json(
