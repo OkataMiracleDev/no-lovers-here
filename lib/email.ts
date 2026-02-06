@@ -5,108 +5,85 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://no-lovers-here.vercel.app';
-  const downloadUrl = `${appUrl}/api/ticket-image/${ticketId}`;
-
+  // Generate ticket PNG with QR code
+  const { generateTicketPNG } = await import('./ticket-generator');
+  const ticketImageBase64 = await generateTicketPNG(name, email, ticketType, ticketId, qrCodeData);
+  
   const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your NO LOVERS HERE Ticket</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: #f5f5f5; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
           
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 40px; text-align: center;">
-              <h1 style="margin: 0 0 10px 0; color: #fff; font-size: 36px; font-weight: 900; letter-spacing: 3px;">NO LOVERS HERE</h1>
-              <div style="width: 60px; height: 4px; background: #fff; margin: 0 auto 15px; border-radius: 2px;"></div>
-              <p style="margin: 0; color: #fff; font-size: 18px; font-weight: 600;">🎉 Your Ticket is Ready!</p>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: 2px;">NO LOVERS HERE</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Ticket is Ready 🎉</p>
             </td>
           </tr>
 
-          <!-- QR Code -->
+          <!-- Ticket Image -->
           <tr>
-            <td style="padding: 50px 40px; text-align: center; background: #fafafa;">
-              <div style="background: #fff; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 20px rgba(102,126,234,0.15);">
-                <img src="${qrCodeData}" alt="QR Code" width="250" height="250" style="display: block; border-radius: 10px;" />
+            <td style="padding: 40px 30px; text-align: center; background-color: #fafafa;">
+              <p style="margin: 0 0 20px 0; color: #333333; font-size: 18px; font-weight: 600;">Your Digital Ticket</p>
+              <div style="background: #ffffff; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                <img src="cid:ticket" alt="Your Ticket" style="max-width: 100%; height: auto; display: block; border-radius: 8px;" />
               </div>
-              <p style="margin: 25px 0 0 0; color: #667eea; font-size: 16px; font-weight: 700; letter-spacing: 1px;">SCAN THIS AT ENTRANCE</p>
+              <p style="margin: 20px 0 5px 0; color: #666666; font-size: 14px;">📎 Ticket attached as PNG file</p>
+              <p style="margin: 0; color: #999999; font-size: 12px;">Download the attachment to save to your phone or print it</p>
             </td>
           </tr>
 
-          <!-- Ticket Details -->
+          <!-- Event Details -->
           <tr>
-            <td style="padding: 0 40px 40px 40px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 16px; padding: 30px; border: 2px solid #667eea20;">
-                <tr>
-                  <td style="padding-bottom: 20px; border-bottom: 2px solid #667eea20;">
-                    <p style="margin: 0 0 8px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">👤 Name</p>
-                    <p style="margin: 0; color: #1a1a1a; font-size: 22px; font-weight: 700;">${name}</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 20px 0; border-bottom: 2px solid #667eea20;">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td width="50%" style="padding-right: 10px;">
-                          <p style="margin: 0 0 8px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">🎫 Type</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 700;">${ticketType}</p>
-                        </td>
-                        <td width="50%" style="padding-left: 10px;">
-                          <p style="margin: 0 0 8px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">📅 Date</p>
-                          <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 700;">Feb 14, 2026</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-top: 20px;">
-                    <p style="margin: 0 0 8px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">⏰ Time</p>
-                    <p style="margin: 0; color: #1a1a1a; font-size: 18px; font-weight: 700;">9:00 PM - 12:00 AM</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Download Button -->
-          <tr>
-            <td style="padding: 0 40px 40px 40px; text-align: center;">
-              <a href="${downloadUrl}" target="_blank" style="display: inline-block; padding: 18px 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 700; box-shadow: 0 8px 20px rgba(102,126,234,0.3); letter-spacing: 0.5px;">
-                🎫 VIEW & SAVE TICKET
-              </a>
-              <p style="margin: 15px 0 0 0; color: #999; font-size: 13px;">Opens your ticket - save as PDF or screenshot</p>
-            </td>
-          </tr>
-
-          <!-- Venue Info -->
-          <tr>
-            <td style="padding: 0 40px 40px 40px;">
-              <div style="background: #fff3cd; padding: 25px; border-radius: 16px; border-left: 5px solid #ffc107;">
-                <p style="margin: 0 0 12px 0; color: #856404; font-size: 16px; font-weight: 700;">📍 Venue</p>
-                <p style="margin: 0 0 8px 0; color: #856404; font-size: 15px; font-weight: 600;">CJ&J Lounge, Suites and Apartment Ltd</p>
-                <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">184 NTA/Choba, Adjacent Open University<br/>Phalga, Port Harcourt 500272</p>
+            <td style="padding: 30px;">
+              <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #667eea;">
+                <h2 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 20px; font-weight: 700;">Event Details</h2>
+                
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="padding-bottom: 15px;">
+                      <p style="margin: 0 0 5px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">📅 Date</p>
+                      <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">February 14, 2026</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 15px;">
+                      <p style="margin: 0 0 5px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">⏰ Time</p>
+                      <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">9:00 PM - 12:00 AM</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p style="margin: 0 0 5px 0; color: #667eea; font-size: 12px; font-weight: 700; text-transform: uppercase;">📍 Venue</p>
+                      <p style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">CJ&J Lounge, Suites and Apartment Ltd</p>
+                      <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.5;">184 NTA/Choba, Adjacent Open University<br/>Phalga, Port Harcourt 500272</p>
+                    </td>
+                  </tr>
+                </table>
               </div>
             </td>
           </tr>
 
-          <!-- Important -->
+          <!-- Important Notice -->
           <tr>
-            <td style="padding: 0 40px 40px 40px;">
-              <div style="background: #ffe5e5; padding: 25px; border-radius: 16px; border-left: 5px solid #ff6b6b;">
-                <p style="margin: 0 0 12px 0; color: #c92a2a; font-size: 16px; font-weight: 700;">⚠️ Important</p>
-                <p style="margin: 0; color: #c92a2a; font-size: 14px; line-height: 1.8;">
-                  • Present QR code at entrance<br/>
-                  • Valid ID required (18+)<br/>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background-color: #fff3cd; padding: 20px; border-radius: 12px; border-left: 4px solid #ffc107;">
+                <p style="margin: 0 0 10px 0; color: #856404; font-size: 14px; font-weight: 700;">⚠️ IMPORTANT</p>
+                <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">
+                  • Present this ticket at the entrance<br/>
+                  • Valid ID required (18+ event)<br/>
                   • Smart casual dress code<br/>
-                  • Non-transferable
+                  • Non-transferable ticket
                 </p>
               </div>
             </td>
@@ -114,10 +91,10 @@ export async function sendTicketEmail(
 
           <!-- Footer -->
           <tr>
-            <td style="padding: 40px; background: #f8f9fa; text-align: center; border-top: 1px solid #e9ecef;">
-              <p style="margin: 0 0 10px 0; color: #999; font-size: 13px;">Questions?</p>
-              <p style="margin: 0 0 20px 0; color: #667eea; font-size: 15px; font-weight: 600;">noreply.nolovershere@gmail.com</p>
-              <p style="margin: 0; color: #ccc; font-size: 12px;">© 2026 NO LOVERS HERE</p>
+            <td style="padding: 30px; background-color: #f8f9fa; text-align: center; border-top: 1px solid #e9ecef;">
+              <p style="margin: 0 0 10px 0; color: #666666; font-size: 13px;">Questions? Contact us at</p>
+              <p style="margin: 0 0 15px 0; color: #667eea; font-size: 14px; font-weight: 600;">noreply.nolovershere@gmail.com</p>
+              <p style="margin: 0; color: #999999; font-size: 12px;">© 2026 NO LOVERS HERE. All rights reserved.</p>
             </td>
           </tr>
 
@@ -150,6 +127,18 @@ export async function sendTicketEmail(
       ],
       subject: '🎉 Your NO LOVERS HERE Ticket - February 14, 2026',
       htmlContent: emailHtml,
+      attachment: [
+        {
+          name: 'NO-LOVERS-HERE-Ticket.png',
+          content: ticketImageBase64,
+        },
+      ],
+      inlineImages: [
+        {
+          name: 'ticket.png',
+          content: ticketImageBase64,
+        },
+      ],
     }),
   });
 
