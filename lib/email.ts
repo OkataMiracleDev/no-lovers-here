@@ -5,9 +5,9 @@ export async function sendTicketEmail(
   qrCodeData: string,
   ticketId: string
 ) {
-  // Generate ticket image with QR code using SVG
-  const { generateTicketDataURL } = await import('./ticket-generator');
-  const ticketImageData = await generateTicketDataURL(name, email, ticketType, ticketId, qrCodeData);
+  // Generate ticket PNG with QR code
+  const { generateTicketPNG } = await import('./ticket-generator');
+  const ticketImageBase64 = await generateTicketPNG(name, email, ticketType, ticketId, qrCodeData);
   
   const emailHtml = `
 <!DOCTYPE html>
@@ -129,14 +129,14 @@ export async function sendTicketEmail(
       htmlContent: emailHtml,
       attachment: [
         {
-          name: 'ticket.png',
-          content: ticketImageData.split(',')[1], // Remove data:image/png;base64, prefix
+          name: 'NO-LOVERS-HERE-Ticket.png',
+          content: ticketImageBase64,
         },
       ],
       inlineImages: [
         {
           name: 'ticket.png',
-          content: ticketImageData.split(',')[1], // Remove data:image/png;base64, prefix
+          content: ticketImageBase64,
         },
       ],
     }),
