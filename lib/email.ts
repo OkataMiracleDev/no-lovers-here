@@ -9,8 +9,12 @@ export async function sendTicketEmail(
   const { generateTicketImage } = await import('./ticket-generator');
   const ticketImageBase64 = await generateTicketImage(name, ticketType, ticketId, qrCodeData);
   
-  // Extract base64 from QR data URL for inline display
-  const qrBase64 = qrCodeData.split(',')[1];
+  // Read logo file and convert to base64
+  const fs = await import('fs');
+  const path = await import('path');
+  const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+  const logoBuffer = fs.readFileSync(logoPath);
+  const logoBase64 = logoBuffer.toString('base64');
   
   const emailHtml = `
 <!DOCTYPE html>
@@ -43,12 +47,12 @@ export async function sendTicketEmail(
                   <td>
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <!-- Left: QR Code -->
+                        <!-- Left: Logo -->
                         <td width="250" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; vertical-align: middle;">
-                          <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 15px;">
-                            <img src="cid:qrcode" alt="QR Code" style="width: 200px; height: 200px; display: block;" />
+                          <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 15px;">
+                            <img src="cid:logo" alt="NO LOVERS HERE" style="width: 180px; height: auto; display: block;" />
                           </div>
-                          <p style="margin: 0; color: white; font-size: 13px; font-weight: bold; letter-spacing: 1.5px;">SCAN AT ENTRANCE</p>
+                          <p style="margin: 0; color: white; font-size: 13px; font-weight: bold; letter-spacing: 1.5px;">DOWNLOAD YOUR TICKET</p>
                         </td>
                         
                         <!-- Right: Ticket Details -->
@@ -93,7 +97,7 @@ export async function sendTicketEmail(
 
               <!-- Save Instructions -->
               <p style="margin: 25px 0 15px 0; color: #666666; font-size: 14px; text-align: center; font-weight: 600;">
-                📱 Download the attached ticket image or screenshot this email
+                📱 Download the attached ticket image - it contains your QR code for entry
               </p>
             </td>
           </tr>
@@ -190,8 +194,8 @@ export async function sendTicketEmail(
       ],
       inlineImages: [
         {
-          name: 'qrcode.png',
-          content: qrBase64,
+          name: 'logo.png',
+          content: logoBase64,
         },
       ],
     }),
